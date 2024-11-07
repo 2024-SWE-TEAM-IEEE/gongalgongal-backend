@@ -32,6 +32,7 @@ dependencies {
 	developmentOnly "org.springframework.boot:spring-boot-devtools" //devtools
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'com.h2database:h2' // Test용 H2 의존성 추가
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -40,6 +41,6 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-test {
-	enabled = false
-}
+//test {
+//	enabled = false
+//}
