@@ -15,10 +15,12 @@ services:
       - spring-mysql-network
 
   app:
-    image: springboot-app-image # Spring Boot의 Dockerfile을 통해 빌드된 이미지 이름
+    build: .
     container_name: springboot-app
     ports:
       - "8080:8080"
+    volumes:
+      - .:/app
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gongalgongal
       SPRING_DATASOURCE_USERNAME: user
