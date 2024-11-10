@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
-import gongalgongal.gongalgongal_spring.model.enums.UserRole;
 
 @Entity
 @Data

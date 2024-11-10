@@ -8,7 +8,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
 import java.time.LocalDateTime;
-import gongalgongal.gongalgongal_spring.model.enums.ReportStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
 
