@@ -31,7 +31,7 @@ public class NoticeGroupCreateResponseDto extends ResponseTemplate<NoticeGroupCr
     @AllArgsConstructor
     public static class GroupCreationData {
         private boolean created;
-        private String group_id;
-        private String share_url;
+        private Long groupId;
+        private String shareUrl;
     }
 }

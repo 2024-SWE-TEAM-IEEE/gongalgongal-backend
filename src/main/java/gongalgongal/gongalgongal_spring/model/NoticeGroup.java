@@ -23,12 +23,18 @@ public class NoticeGroup {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private String share_url;
+
+    private String crawl_site_url;
+
     // 기본 생성자
     public NoticeGroup() {}
 
     // 생성자
-    public NoticeGroup(Long adminId, String groupName) {
+    public NoticeGroup(Long adminId, String groupName, String share_url, String crawl_site_url) {
         this.adminId = adminId;
         this.groupName = groupName;
+        this.share_url = share_url;
+        this.crawl_site_url = crawl_site_url;
     }
 }

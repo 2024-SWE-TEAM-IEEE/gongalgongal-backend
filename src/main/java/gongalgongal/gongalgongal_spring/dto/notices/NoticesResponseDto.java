@@ -61,9 +61,9 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
         private String title;
         private List<Category> categories;
         private String author;
-        private LocalDateTime noticed_date;
-        private boolean is_favorited;
-        private boolean is_starred;
+        private LocalDateTime noticedDate;
+        private boolean isStored;
+        private boolean isStarred;
     }
 
     @Data

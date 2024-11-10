@@ -57,11 +57,11 @@ public class NoticeDetailResponseDto extends ResponseTemplate<NoticeDetailRespon
         private List<Category> categories;
         private String content;
         private String author;
-        private LocalDateTime noticed_date;
+        private LocalDateTime noticedDate;
         private String url;
-        private boolean is_favorited;
-        private boolean is_starred;
-        private boolean is_participating;
+        private boolean isStored;
+        private boolean isStarred;
+        private boolean isParticipating;
     }
 
     @Data

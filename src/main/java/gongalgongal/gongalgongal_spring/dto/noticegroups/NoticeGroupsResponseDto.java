@@ -75,9 +75,9 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NoticeGroupListResponseDto extends ResponseTemplate<NoticeGroupListResponseDto.GroupListData> {
+public class NoticeGroupsResponseDto extends ResponseTemplate<NoticeGroupsResponseDto.GroupListData> {
 
-    public NoticeGroupListResponseDto(Status status, GroupListData data) {
+    public NoticeGroupsResponseDto(Status status, GroupListData data) {
         super(status, data);
     }
 
@@ -92,11 +92,11 @@ public class NoticeGroupListResponseDto extends ResponseTemplate<NoticeGroupList
     public static class Group {
         private String id;
         private String name;
-        private int admin_id;
-        private String site_url;
-        private List<Integer> group_category;
+        private int adminId;
+        private String siteUrl;
+        private List<Integer> groupCategory;
         private String description;
-        private String share_url;
+        private String shareUrl;
         private List<Member> members;
     }
 
