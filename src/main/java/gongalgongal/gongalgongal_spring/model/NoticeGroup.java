@@ -16,7 +16,7 @@ public class NoticeGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
-    private Long userId;
+    private Long adminId;
 
     private String groupName;
 
@@ -27,8 +27,8 @@ public class NoticeGroup {
     public NoticeGroup() {}
 
     // 생성자
-    public NoticeGroup(Long userId, String groupName) {
-        this.userId = userId;
+    public NoticeGroup(Long adminId, String groupName) {
+        this.adminId = adminId;
         this.groupName = groupName;
     }
 }
