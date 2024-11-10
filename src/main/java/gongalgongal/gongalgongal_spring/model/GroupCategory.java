@@ -11,9 +11,10 @@ import lombok.Data;
 public class GroupCategory {
 
     @Id
-    private Long groupId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long groupCategoryId;
 
-    @Id
+    private Long groupId;
     private Long categoryId;
 
     // 기본 생성자

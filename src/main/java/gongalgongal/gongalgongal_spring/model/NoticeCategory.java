@@ -11,9 +11,10 @@ import lombok.Data;
 public class NoticeCategory {
 
     @Id
-    private Long noticeId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long noticeCategoryId;
 
-    @Id
+    private Long noticeId;
     private Long categoryId;
 
     // 기본 생성자

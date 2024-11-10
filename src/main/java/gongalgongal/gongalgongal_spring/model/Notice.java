@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Data
@@ -20,16 +22,16 @@ public class Notice {
 
     private String url;
 
-    private Timestamp createdAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     // 기본 생성자
     public Notice() {}
 
     // 생성자
-    public Notice(String title, String author, String url, Timestamp createdAt) {
+    public Notice(String title, String author, String url) {
         this.title = title;
         this.author = author;
         this.url = url;
-        this.createdAt = createdAt;
     }
 }

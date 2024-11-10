@@ -4,7 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
+import java.time.LocalDateTime;
+import gongalgongal.gongalgongal_spring.model.enums.ReportStatus;
+import org.hibernate.annotations.CreationTimestamp;
 
 
 @Entity
@@ -21,7 +26,8 @@ public class Report {
 
     private String reason;
 
-    private Timestamp createdAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
@@ -30,16 +36,10 @@ public class Report {
     public Report() {}
 
     // 생성자
-    public Report(Long messageId, Long reportingUserId, String reason, Timestamp createdAt, ReportStatus status) {
+    public Report(Long messageId, Long reportingUserId, String reason, ReportStatus status) {
         this.messageId = messageId;
         this.reportingUserId = reportingUserId;
         this.reason = reason;
-        this.createdAt = createdAt;
         this.status = status;
     }
-}
-
-// ENUM 타입 정의
-public enum ReportStatus {
-    Received, InProgress, Completed
 }

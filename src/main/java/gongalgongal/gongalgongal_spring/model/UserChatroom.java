@@ -11,9 +11,10 @@ import lombok.Data;
 public class UserChatroom {
 
     @Id
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userChatroomId;
 
-    @Id
+    private Long userId;
     private Long chatId;
 
     // 기본 생성자

@@ -4,16 +4,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
+import gongalgongal.gongalgongal_spring.model.enums.UserRole;
 
 @Entity
 @Data
 public class UserGroup {
 
     @Id
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userGroupId;
 
-    @Id
+    private Long userId;
     private Long groupId;
 
     @Enumerated(EnumType.STRING)
@@ -30,7 +34,3 @@ public class UserGroup {
     }
 }
 
-// ENUM 타입 정의
-public enum UserRole {
-    Admin, Member
-}

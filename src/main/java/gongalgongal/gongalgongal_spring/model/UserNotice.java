@@ -11,9 +11,10 @@ import lombok.Data;
 public class UserNotice {
 
     @Id
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userNoticeId;
 
-    @Id
+    private Long userId;
     private Long noticeId;
 
     private Boolean isStarred;

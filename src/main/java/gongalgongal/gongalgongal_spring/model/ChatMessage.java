@@ -5,7 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
-
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Data
@@ -21,17 +22,17 @@ public class ChatMessage {
 
     private String content;
 
-    private Timestamp createdAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     // 기본 생성자
     public ChatMessage() {}
 
     // 생성자
-    public ChatMessage(Long userId, Long chatId, String content, Timestamp createdAt) {
+    public ChatMessage(Long userId, Long chatId, String content) {
         this.userId = userId;
         this.chatId = chatId;
         this.content = content;
-        this.createdAt = createdAt;
     }
 }
 
