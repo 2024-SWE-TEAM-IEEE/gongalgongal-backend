@@ -6,28 +6,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-
 @Entity
 @Data
-public class User {
+public class GroupCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long groupCategoryId;
 
-    private String name;
-
-    private String email;
-
-    private String password;
+    private Long groupId;
+    private Long categoryId;
 
     // 기본 생성자
-    public User() {}
+    public GroupCategory() {}
 
     // 생성자
-    public User(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
+    public GroupCategory(Long groupId, Long categoryId) {
+        this.groupId = groupId;
+        this.categoryId = categoryId;
     }
 }

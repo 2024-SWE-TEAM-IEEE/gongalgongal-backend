@@ -6,28 +6,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-
 @Entity
 @Data
-public class User {
+public class UserChatroom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userChatroomId;
+
     private Long userId;
-
-    private String name;
-
-    private String email;
-
-    private String password;
+    private Long chatId;
 
     // 기본 생성자
-    public User() {}
+    public UserChatroom() {}
 
     // 생성자
-    public User(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
+    public UserChatroom(Long userId, Long chatId) {
+        this.userId = userId;
+        this.chatId = chatId;
     }
 }
+
