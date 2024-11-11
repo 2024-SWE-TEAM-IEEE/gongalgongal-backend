@@ -30,11 +30,22 @@ dependencies {
 	implementation 'mysql:mysql-connector-java:8.0.33'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2' //Swagger
 	developmentOnly "org.springframework.boot:spring-boot-devtools" //devtools
-	compileOnly 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok' //lombok
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'com.h2database:h2' // Test용 H2 의존성 추가
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 처리 모듈 추가
+
+	// Spring Security Crypto
+	implementation 'org.springframework.security:spring-security-crypto'
 }
 
 tasks.named('test') {
