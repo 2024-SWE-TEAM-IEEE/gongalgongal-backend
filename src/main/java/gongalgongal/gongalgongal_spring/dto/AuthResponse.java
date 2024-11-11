@@ -1,4 +1,4 @@
-package gongalgongal.gongalgongal_spring.response;
+package gongalgongal.gongalgongal_spring.dto;
 
 import lombok.Data;
 

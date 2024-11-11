@@ -1,8 +1,8 @@
 package gongalgongal.gongalgongal_spring.controller;
 
-import gongalgongal.gongalgongal_spring.response.AuthResponse;
-import gongalgongal.gongalgongal_spring.response.UserLoginRequest;
-import gongalgongal.gongalgongal_spring.response.UserSignupRequest;
+import gongalgongal.gongalgongal_spring.dto.AuthResponse;
+import gongalgongal.gongalgongal_spring.dto.UserLoginRequest;
+import gongalgongal.gongalgongal_spring.dto.UserSignupRequest;
 import gongalgongal.gongalgongal_spring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
