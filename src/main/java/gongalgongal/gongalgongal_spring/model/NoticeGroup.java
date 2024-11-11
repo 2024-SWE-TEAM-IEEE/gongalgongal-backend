@@ -16,19 +16,25 @@ public class NoticeGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
-    private Long userId;
+    private Long adminId;
 
     private String groupName;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private String share_url;
+
+    private String crawl_site_url;
+
     // 기본 생성자
     public NoticeGroup() {}
 
     // 생성자
-    public NoticeGroup(Long userId, String groupName) {
-        this.userId = userId;
+    public NoticeGroup(Long adminId, String groupName, String share_url, String crawl_site_url) {
+        this.adminId = adminId;
         this.groupName = groupName;
+        this.share_url = share_url;
+        this.crawl_site_url = crawl_site_url;
     }
 }
