@@ -1,27 +1,28 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
-    // 기본 생성자
-    public User() {}
+    private String name;
 
-    // 생성자
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
+    @Column(nullable = false)
+    private String password;
+
+    @ElementCollection
+    private List<String> preferredTags;
 }
-
