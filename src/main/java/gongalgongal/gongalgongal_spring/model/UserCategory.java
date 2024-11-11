@@ -1,0 +1,28 @@
+package gongalgongal.gongalgongal_spring.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Data;
+
+@Entity
+@Data
+public class UserCategory {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userCategoryId;
+
+    private Long categoryId;
+    private Long userId;
+
+    // 기본 생성자
+    public UserCategory() {}
+
+    // 생성자
+    public UserCategory(Long categoryId, Long userId) {
+        this.categoryId = categoryId;
+        this.userId = userId;
+    }
+}
