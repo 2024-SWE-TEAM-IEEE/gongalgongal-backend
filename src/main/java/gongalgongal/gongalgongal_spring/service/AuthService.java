@@ -41,16 +41,6 @@ public class AuthService {
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // selectedCategoryIds가 null인 경우 빈 리스트로 초기화
-        List<Long> selectedCategoryIds = request.getSelectedCategoryIds() != null ? request.getSelectedCategoryIds() : new ArrayList<>();
-
-        // 카테고리 ID에 해당하는 카테고리 엔티티 조회 및 설정
-        List<Category> selectedCategories = categoryRepository.findAllById(selectedCategoryIds);
-        user.setSelectedCategories(new HashSet<>(selectedCategories));
-
-        System.out.println("Selected Category IDs: " + selectedCategoryIds);
-        System.out.println("Selected Categories: " + selectedCategories);
-
         userRepository.save(user);
 
         // 로그인 성공 시 JWT 토큰 생성
