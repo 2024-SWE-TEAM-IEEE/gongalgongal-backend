@@ -40,9 +40,6 @@ public class UserService {
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
             }
-
-
-            user.setSelectedCategories(categories);
             return userRepository.save(user);
         });
     }
