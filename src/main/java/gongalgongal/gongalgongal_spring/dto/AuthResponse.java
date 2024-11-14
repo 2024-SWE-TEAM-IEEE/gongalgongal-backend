@@ -30,9 +30,9 @@ public class AuthResponse {
     @Getter
     @Setter
     public static class Data {
-        private String AccessToken;  // 자바 방식으로 네이밍
+        private String AccessToken;
 
-        public Data(String token) {
+        public Data(String AccessToken) {
             this.AccessToken = AccessToken;
         }
     }
