@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -27,7 +29,8 @@ public class NoticeGroupController {
     // 공지 그룹 생성
     @PostMapping
     public ResponseEntity<NoticeGroupCreateResponseDto> createNoticeGroup(
-            @RequestBody NoticeGroupCreateRequestDto request) {
+            @RequestBody NoticeGroupCreateRequestDto request,
+            Authentication authentication) { // Authentication 객체 추가
 
         if (request.getGroupName() == null || request.getDescription() == null) {
             // 필수 파라미터 누락 시 실패 응답 생성
@@ -38,8 +41,13 @@ public class NoticeGroupController {
 
         try {
             // 서비스 계층에서 공지 그룹 생성 처리
-            NoticeGroupCreateResponseDto response = noticeGroupService.createNoticeGroup(request);
+            NoticeGroupCreateResponseDto response = noticeGroupService.createNoticeGroup(request, authentication);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            // 잘못된 입력값 예외 처리
+            NoticeGroupCreateResponseDto response = new NoticeGroupCreateResponseDto(
+                    new NoticeGroupCreateResponseDto.Status("failed", e.getMessage()), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
             // 예외 상황에 대한 응답 설정
             NoticeGroupCreateResponseDto response = new NoticeGroupCreateResponseDto(
@@ -67,9 +75,6 @@ public class NoticeGroupController {
     @PostMapping("/{group_id}/join")
     public ResponseEntity<NoticeGroupJoinResponseDto> joinNoticeGroup(
             @PathVariable("group_id") Long groupId) {  // URL에서 group_id를 받아옴
-
-        // group_id가 제대로 전달되는지 확인하기 위해 출력
-        System.out.println("Received group_id: " + groupId);
 
         try {
             NoticeGroupJoinResponseDto response = noticeGroupService.joinNoticeGroup(groupId);

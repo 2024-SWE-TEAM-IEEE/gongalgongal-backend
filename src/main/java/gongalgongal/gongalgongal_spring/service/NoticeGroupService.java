@@ -6,59 +6,86 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupJoinResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.NoticeGroup;
+import gongalgongal.gongalgongal_spring.model.User;
+import gongalgongal.gongalgongal_spring.model.Category;
+
+import gongalgongal.gongalgongal_spring.repository.UserRepository;
+import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.NoticeGroupRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
-import java.util.NoSuchElementException;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NoticeGroupService {
 
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final NoticeGroupRepository noticeGroupRepository;
 
     @Autowired
-    public NoticeGroupService(NoticeGroupRepository noticeGroupRepository) {
+    public NoticeGroupService(
+            UserRepository userRepository,
+            CategoryRepository categoryRepository,
+            NoticeGroupRepository noticeGroupRepository) {
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.noticeGroupRepository = noticeGroupRepository;
     }
 
     /* 공지 그룹 생성 */
-    public NoticeGroupCreateResponseDto createNoticeGroup(NoticeGroupCreateRequestDto request) {
+    public NoticeGroupCreateResponseDto createNoticeGroup(NoticeGroupCreateRequestDto request, Authentication authentication) {
 
-//        // 객체 생성
-//        savedNoticeGroup = saveNoticeGroup(request, shareUrl);
-//
-//        // 공유 URL 생성 후 url 업데이트
-//        String shareUrl = makeShareURL(savedNoticeGroup.getNoticeId());
-//        savedNoticeGroup.setShareUrl(shareUrl);
-//        noticeGroupRepository.save(savedNoticeGroup);
+        // 1. Authentication 객체에서 adminId 추출
+        String email = authentication.getName(); // 이메일 가져오기
+        Long adminId = userRepository.findByEmail(email)
+                .map(User::getId) // 유저 ID 추출
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
-        // 응답 DTO 생성
+        // 2. Category 매핑 (카테고리가 비어 있어도 처리 가능)
+        List<Long> categoryIds = request.getGroupCategory().stream()
+                .map(Integer::longValue) // Integer → Long 변환
+                .collect(Collectors.toList());
+        Set<Category> categories = categoryIds == null || categoryIds.isEmpty()
+                ? Collections.emptySet() // 빈 Set 처리
+                : new HashSet<>(categoryRepository.findAllById(categoryIds)); // ID로 Category 조회
+
+        // 3. NoticeGroup 생성
+        NoticeGroup noticeGroup = new NoticeGroup(
+                adminId,
+                request.getGroupName(),
+                null, // 공유 URL은 나중에 생성
+                request.getCrawlSiteUrl()
+        );
+        noticeGroup.setGroupCategory(categories); // Category와 매핑
+        NoticeGroup savedNoticeGroup = noticeGroupRepository.save(noticeGroup);
+
+        // 4. 저장된 그룹 ID를 기반으로 공유 URL 생성
+        String shareUrl = generateShareUrl(savedNoticeGroup.getGroupId(), savedNoticeGroup.getGroupName());
+        savedNoticeGroup.setShareUrl(shareUrl);
+
+        // 5. 공유 URL 업데이트
+        noticeGroupRepository.save(savedNoticeGroup);
+
+        // 6. 응답 DTO 생성
         NoticeGroupCreateResponseDto.Status status = new NoticeGroupCreateResponseDto.Status("success", "Group created successfully");
-//        NoticeGroupCreateResponseDto.GroupCreationData data = new NoticeGroupCreateResponseDto.GroupCreationData(true, savedNotice.getNoticeId().toString(), shareUrl);
-        NoticeGroupCreateResponseDto.GroupCreationData data = new NoticeGroupCreateResponseDto.GroupCreationData(true, (long) 1, "https://www.dongguk.edu/main/share"); // 그룹 ID를 임의 설정
+        NoticeGroupCreateResponseDto.GroupCreationData data = new NoticeGroupCreateResponseDto.GroupCreationData(
+                true,
+                savedNoticeGroup.getGroupId(),
+                shareUrl
+        );
 
         return new NoticeGroupCreateResponseDto(status, data);
     }
 
-    // [[TODO]]
-    private String makeShareURL() {
-        return "";
+    /* 공유 URL 생성 */
+    private String generateShareUrl(Long groupId, String groupName) {
+        return "https://your-service.com/groups/" + groupName.replace(" ", "-") + "-" + groupId;
     }
-
-    // [[TODO]]
-    private void saveNoticeGroup(NoticeGroupCreateRequestDto request) {
-//        NoticeGroup noticeGroup = new NoticeGroup(
-//                request.getAdminId(),
-//                request.getGroupName(),
-//                null,
-//                request.getCrawlSiteUrl()
-//        );
-//        NoticeGroup savedNoticeGroup = noticeGroupRepository.save(noticeGroup);
-//        return savedNoticeGroup
-    }
-
 
 
     /* 참가한 공지 그룹 리스트 조회 */

@@ -1,11 +1,9 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -23,18 +21,27 @@ public class NoticeGroup {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private String share_url;
+    private String shareUrl;
 
-    private String crawl_site_url;
+    private String crawlSiteUrl;
+
+    // Many-to-Many 관계 설정
+    @ManyToMany
+    @JoinTable(
+            name = "group_category", // 연결 테이블 이름
+            joinColumns = @JoinColumn(name = "group_id"), // NoticeGroup의 외래키
+            inverseJoinColumns = @JoinColumn(name = "category_id") // GroupCategory의 외래키
+    )
+    private Set<Category> groupCategory; // Set으로 변경하여 중복 방지
 
     // 기본 생성자
     public NoticeGroup() {}
 
     // 생성자
-    public NoticeGroup(Long adminId, String groupName, String share_url, String crawl_site_url) {
+    public NoticeGroup(Long adminId, String groupName, String shareUrl, String crawlSiteUrl) {
         this.adminId = adminId;
         this.groupName = groupName;
-        this.share_url = share_url;
-        this.crawl_site_url = crawl_site_url;
+        this.shareUrl = shareUrl;
+        this.crawlSiteUrl = crawlSiteUrl;
     }
 }
