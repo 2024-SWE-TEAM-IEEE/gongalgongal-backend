@@ -3,17 +3,26 @@ package gongalgongal.gongalgongal_spring.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// Swagger URL => http://localhost:8080/swagger-ui/index.html#/
-@Configuration    // 스프링 실행시 설정파일 읽어드리기 위한 어노테이션
+@Configuration
 public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
+        SecurityScheme securityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
+
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
+
         return new OpenAPI()
-                .components(new Components())
+                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+                .addSecurityItem(securityRequirement)
                 .info(apiInfo());
     }
 
