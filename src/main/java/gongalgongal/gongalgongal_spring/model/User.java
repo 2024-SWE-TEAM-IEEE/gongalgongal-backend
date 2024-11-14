@@ -3,7 +3,7 @@ package gongalgongal.gongalgongal_spring.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,6 +23,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection
-    private List<String> preferredTags;
+    @ManyToMany
+    @JoinTable(
+            name = "user_category",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> selectedCategories;
 }

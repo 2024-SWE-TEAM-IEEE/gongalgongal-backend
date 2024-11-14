@@ -13,5 +13,5 @@ public class UserSignupRequest {
     private String email;
     private String name;
     private String password;
-    private List<String> preferredTags;
+    private List<Long> selectedCategoryIds;
 }

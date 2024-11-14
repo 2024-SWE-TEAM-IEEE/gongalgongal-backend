@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -16,14 +18,11 @@ public class Category {
 
     private String categoryName;
 
-    private String description;
-
     // 기본 생성자
     public Category() {}
 
     // 생성자
-    public Category(String categoryName, String description) {
+    public Category(String categoryName) {
         this.categoryName = categoryName;
-        this.description = description;
     }
 }

@@ -17,8 +17,8 @@ public class AuthController {
 
     // 회원가입 엔드포인트
     @PostMapping("/join")
-    public ResponseEntity<String> register(@RequestBody UserSignupRequest request) {
-        String response = authService.register(request);
+    public ResponseEntity<AuthResponse> register(@RequestBody UserSignupRequest request) {
+        AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
 
