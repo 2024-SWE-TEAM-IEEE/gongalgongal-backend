@@ -68,10 +68,4 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
         private boolean isParticipating;
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class Category {
-        private long id;
-        private String name;
-    }
 }

@@ -34,22 +34,6 @@ public class UserInfoResponse {
     public static class Data {
         private String email;
         private String name;
-
-        public Data(String email, String name, List<CategoryInfo> categories) {
-            this.email = email;
-            this.name = name;
-        }
     }
 
-    @Getter
-    @Setter
-    public static class CategoryInfo {
-        private Long id;
-        private String name;
-
-        public CategoryInfo(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
 }

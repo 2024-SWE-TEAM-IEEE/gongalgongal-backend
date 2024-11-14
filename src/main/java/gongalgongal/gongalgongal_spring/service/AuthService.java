@@ -22,9 +22,6 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired

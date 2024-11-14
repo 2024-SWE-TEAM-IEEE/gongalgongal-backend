@@ -35,15 +35,6 @@ public class ChatroomListResponseDto extends ResponseTemplate<ChatroomListRespon
         private List<Member> members;  // 멤버 리스트
     }
 
-    // Category 내부 클래스 정의
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Category {
-        private Long id;     // 카테고리 id
-        private String name; // 카테고리 이름
-    }
-
     // Member 내부 클래스 정의
     @Data
     @AllArgsConstructor
