@@ -6,6 +6,7 @@ import gongalgongal.gongalgongal_spring.model.Category;
 import gongalgongal.gongalgongal_spring.model.User;
 import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.Set;
@@ -16,10 +17,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CategoryRepository categoryRepository) {
+    public UserService(UserRepository userRepository, CategoryRepository categoryRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<UserInfoResponse> getUserInfo(String email) {
@@ -42,6 +45,11 @@ public class UserService {
     public Optional<User> updateUser(String email, UpdateUserRequest request) {
         return userRepository.findByEmail(email).map(user -> {
             user.setName(request.getName());
+
+            // 비밀번호 업데이트 (암호화 후 저장)
+            if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+            }
 
             // 선택된 카테고리 ID로 카테고리 목록 조회
             Set<Category> categories = request.getSelectedCategoryIds().stream()
