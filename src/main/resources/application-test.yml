@@ -14,4 +14,4 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     serialization:
-      FAIL_ON_EMPTY_BEANS=false:
+      FAIL_ON_EMPTY_BEANS: false
