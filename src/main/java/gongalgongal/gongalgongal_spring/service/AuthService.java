@@ -22,10 +22,11 @@ public class AuthService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // 회원가입 메서드
-    public String register(UserSignupRequest request) {
+    public AuthResponse register(UserSignupRequest request) {
         // 이미 존재하는 이메일인지 확인
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use.");
+            AuthResponse.Status status = new AuthResponse.Status("failed", "Email already in use.");
+            return new AuthResponse(status, null);
         }
 
         // 비밀번호 암호화 후 유저 생성
@@ -36,22 +37,36 @@ public class AuthService {
         user.setPreferredTags(request.getPreferredTags());
         userRepository.save(user);
 
-        return "User registered successfully";
+        // 회원가입 성공 응답 반환
+        AuthResponse.Status status = new AuthResponse.Status("success", "User registered successfully");
+        return new AuthResponse(status, null);
     }
 
     // 로그인 메서드
     public AuthResponse login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElse(null); // 유저가 없으면 null 반환
+
+        if (user == null) {
+            // 사용자 없음 -> 실패 응답 생성
+            AuthResponse.Status status = new AuthResponse.Status("failed", "User not found");
+            return new AuthResponse(status, null);
+        }
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials.");
+            // 비밀번호 불일치 -> 실패 응답 생성
+            AuthResponse.Status status = new AuthResponse.Status("failed", "Invalid credentials");
+            return new AuthResponse(status, null);
         }
 
-        // JWT 토큰 생성
+        // 로그인 성공 시 JWT 토큰 생성
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse(token);
+
+        // 성공 응답 생성 및 반환
+        AuthResponse.Status status = new AuthResponse.Status("success", "Login successful");
+        AuthResponse.Data data = new AuthResponse.Data(token);
+        return new AuthResponse(status, data);
     }
 }
 
