@@ -1,5 +1,6 @@
 package gongalgongal.gongalgongal_spring.model;
 
+import gongalgongal.gongalgongal_spring.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Data;
 

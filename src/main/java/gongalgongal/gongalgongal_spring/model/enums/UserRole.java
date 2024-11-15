@@ -1,4 +1,4 @@
-package gongalgongal.gongalgongal_spring.model;
+package gongalgongal.gongalgongal_spring.model.enums;
 
 public enum UserRole {
     Admin,

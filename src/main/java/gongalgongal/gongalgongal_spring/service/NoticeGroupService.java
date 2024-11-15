@@ -11,7 +11,7 @@ import gongalgongal.gongalgongal_spring.model.NoticeGroup;
 import gongalgongal.gongalgongal_spring.model.User;
 import gongalgongal.gongalgongal_spring.model.UserGroup;
 import gongalgongal.gongalgongal_spring.model.Category;
-import gongalgongal.gongalgongal_spring.model.UserRole;
+import gongalgongal.gongalgongal_spring.model.enums.UserRole;
 
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import gongalgongal.gongalgongal_spring.repository.UserGroupRepository;
@@ -116,7 +116,7 @@ public class NoticeGroupService {
 
     /* 실제 userId로 그룹리스트 찾는 로직 구현 */
     @Transactional
-    private List<NoticeGroupsResponseDto.Group> searchJoinedNoticeGroups(Long userId) {
+    public List<NoticeGroupsResponseDto.Group> searchJoinedNoticeGroups(Long userId) {
         // 1. UserGroup 테이블에서 userId로 NoticeGroup 조회
         List<UserGroup> userGroups = userGroupRepository.findByUser_Id(userId);
 
