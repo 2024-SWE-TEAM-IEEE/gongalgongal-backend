@@ -1,12 +1,9 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.*;
 
 @Entity
 @Data
@@ -16,20 +13,26 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userGroupId;
 
-    private Long userId;
-    private Long groupId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; // User와 다대일 관계
+
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false)
+    private NoticeGroup noticeGroup; // NoticeGroup과 다대일 관계
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role; // 역할: ADMIN 또는 MEMBER
 
     // 기본 생성자
     public UserGroup() {}
 
     // 생성자
-    public UserGroup(Long userId, Long groupId, UserRole role) {
-        this.userId = userId;
-        this.groupId = groupId;
+    public UserGroup(User user, NoticeGroup noticeGroup, UserRole role) {
+        this.user = user;
+        this.noticeGroup = noticeGroup;
         this.role = role;
     }
 }
+
 

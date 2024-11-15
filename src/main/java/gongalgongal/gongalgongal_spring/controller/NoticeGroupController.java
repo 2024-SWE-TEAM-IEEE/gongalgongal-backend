@@ -74,10 +74,10 @@ public class NoticeGroupController {
 
     @PostMapping("/{group_id}/join")
     public ResponseEntity<NoticeGroupJoinResponseDto> joinNoticeGroup(
-            @PathVariable("group_id") Long groupId) {  // URL에서 group_id를 받아옴
-
+            @PathVariable("group_id") Long groupId,
+            Authentication authentication) { // 인증 정보 추가
         try {
-            NoticeGroupJoinResponseDto response = noticeGroupService.joinNoticeGroup(groupId);
+            NoticeGroupJoinResponseDto response = noticeGroupService.joinNoticeGroup(groupId, authentication);
             return ResponseEntity.ok(response); // 200 OK
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

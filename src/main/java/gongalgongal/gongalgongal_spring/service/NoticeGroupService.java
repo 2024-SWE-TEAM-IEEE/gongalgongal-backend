@@ -7,9 +7,12 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.NoticeGroup;
 import gongalgongal.gongalgongal_spring.model.User;
+import gongalgongal.gongalgongal_spring.model.UserGroup;
 import gongalgongal.gongalgongal_spring.model.Category;
+import gongalgongal.gongalgongal_spring.model.UserRole;
 
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
+import gongalgongal.gongalgongal_spring.repository.UserGroupRepository;
 import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.NoticeGroupRepository;
 
@@ -24,26 +27,29 @@ import java.util.stream.Collectors;
 public class NoticeGroupService {
 
     private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
     private final CategoryRepository categoryRepository;
     private final NoticeGroupRepository noticeGroupRepository;
 
     @Autowired
     public NoticeGroupService(
             UserRepository userRepository,
+            UserGroupRepository userGroupRepository,
             CategoryRepository categoryRepository,
             NoticeGroupRepository noticeGroupRepository) {
         this.userRepository = userRepository;
+        this.userGroupRepository = userGroupRepository;
         this.categoryRepository = categoryRepository;
         this.noticeGroupRepository = noticeGroupRepository;
     }
 
     /* 공지 그룹 생성 */
+    /* 공지 그룹 생성 */
     public NoticeGroupCreateResponseDto createNoticeGroup(NoticeGroupCreateRequestDto request, Authentication authentication) {
 
         // 1. Authentication 객체에서 adminId 추출
         String email = authentication.getName(); // 이메일 가져오기
-        Long adminId = userRepository.findByEmail(email)
-                .map(User::getId) // 유저 ID 추출
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
         // 2. Category 매핑 (카테고리가 비어 있어도 처리 가능)
@@ -56,7 +62,7 @@ public class NoticeGroupService {
 
         // 3. NoticeGroup 생성
         NoticeGroup noticeGroup = new NoticeGroup(
-                adminId,
+                user.getId(),
                 request.getGroupName(),
                 null, // 공유 URL은 나중에 생성
                 request.getCrawlSiteUrl()
@@ -67,9 +73,11 @@ public class NoticeGroupService {
         // 4. 저장된 그룹 ID를 기반으로 공유 URL 생성
         String shareUrl = generateShareUrl(savedNoticeGroup.getGroupId(), savedNoticeGroup.getGroupName());
         savedNoticeGroup.setShareUrl(shareUrl);
+        noticeGroupRepository.save(savedNoticeGroup); // 공유 URL 업데이트
 
-        // 5. 공유 URL 업데이트
-        noticeGroupRepository.save(savedNoticeGroup);
+        // 5. 생성자를 UserGroup에 Admin으로 추가
+        UserGroup userGroup = new UserGroup(user, savedNoticeGroup, UserRole.Admin); // 역할: ADMIN
+        userGroupRepository.save(userGroup);
 
         // 6. 응답 DTO 생성
         NoticeGroupCreateResponseDto.Status status = new NoticeGroupCreateResponseDto.Status("success", "Group created successfully");
@@ -135,35 +143,40 @@ public class NoticeGroupService {
 
 
     /* 공지 그룹 참가 */
-    public NoticeGroupJoinResponseDto joinNoticeGroup(Long groupId) {
-        // 그룹 ID가 유효한지 확인
-//        NoticeGroup noticeGroup = noticeGroupRepository.findById(groupId)
-//                .orElseThrow(() -> new NoSuchElementException("Group not found"));
+    public NoticeGroupJoinResponseDto joinNoticeGroup(Long groupId, Authentication authentication) {
+        // 1. Authentication 객체에서 유저 이메일 가져오기
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
-        // 이미 참가한 상태인지 확인
-        if (isUserAlreadyJoined(groupId)) {
+        // 2. 그룹 존재 여부 확인
+        NoticeGroup noticeGroup = noticeGroupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Group not found with ID: " + groupId));
+
+        // 3. 이미 참가한 상태인지 확인
+        if (isUserAlreadyJoined(user, noticeGroup)) {
             throw new IllegalStateException("User already joined the group");
         }
 
-        // 참가 로직 처리
-        joinUserToGroup(groupId);
+        // 4. 참가 로직 처리
+        joinUserToGroup(user, noticeGroup);
 
-        // 성공 응답 생성
-        return new NoticeGroupJoinResponseDto(new NoticeGroupJoinResponseDto.Status("success", "Joined group successfully"));
+        // 5. 성공 응답 생성
+        return new NoticeGroupJoinResponseDto(
+                new NoticeGroupJoinResponseDto.Status("success", "Joined group successfully")
+        );
     }
 
-    // [[TODO]]
-    private boolean isUserAlreadyJoined(Long groupId) {
-        // 이미 참가한 그룹인지 확인하는 로직 (예: 특정 사용자 ID가 그룹에 이미 존재하는지 검사)
-        return false; // 예제 코드에서는 false로 설정
+    /* 이미 참가한 그룹인지 확인 */
+    private boolean isUserAlreadyJoined(User user, NoticeGroup noticeGroup) {
+        return userGroupRepository.existsByUserAndNoticeGroup(user, noticeGroup);
     }
 
-    // [[TODO]]
-    private void joinUserToGroup(Long groupId) {
-        // 실제 그룹 참가 로직 구현
+    /* 그룹 참가 로직 구현 */
+    private void joinUserToGroup(User user, NoticeGroup noticeGroup) {
+        // UserGroup 생성 및 저장
+        UserGroup userGroup = new UserGroup(user, noticeGroup, UserRole.Member); // 기본 역할: MEMBER
+        userGroupRepository.save(userGroup);
     }
-
-
-
 
 }
