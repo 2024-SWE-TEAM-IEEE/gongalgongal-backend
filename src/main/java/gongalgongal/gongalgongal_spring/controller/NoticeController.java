@@ -3,6 +3,7 @@ package gongalgongal.gongalgongal_spring.controller;
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeService;
 
@@ -79,4 +80,20 @@ public class NoticeController {
         }
     }
 
+    @DeleteMapping("/{notice_id}/store")
+    public ResponseEntity<NoticeDeleteResponseDto> unstoreNotice(
+            @PathVariable("notice_id") Long noticeId,
+            Authentication authentication) {
+        try {
+            noticeService.unstoreNotice(noticeId, authentication);
+            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("success", "Notice successfully unstored");
+            return ResponseEntity.status(HttpStatus.OK).body(new NoticeDeleteResponseDto(status));
+        } catch (IllegalArgumentException e) {
+            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("failed", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeDeleteResponseDto(status));
+        } catch (Exception e) {
+            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("failed", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeDeleteResponseDto(status));
+        }
+    }
 }

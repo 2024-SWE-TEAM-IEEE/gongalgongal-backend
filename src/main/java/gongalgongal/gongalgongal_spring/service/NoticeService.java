@@ -3,6 +3,7 @@ package gongalgongal.gongalgongal_spring.service;
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -150,6 +151,41 @@ public class NoticeService {
 
         return new NoticeStoreResponseDto(
                 new NoticeStoreResponseDto.Status("success", "Notice successfully stored"));
+    }
+
+    public NoticeDeleteResponseDto unstoreNotice(Long noticeId, Authentication authentication) {
+        String userEmail = authentication.getName();
+
+        // 사용자 조회
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return new NoticeDeleteResponseDto(
+                    new NoticeDeleteResponseDto.Status("failed", "User not found"));
+        }
+        User user = userOpt.get();
+
+        // 공지사항 조회
+        Optional<Notice> noticeOpt = noticeRepository.findById(noticeId);
+        if (noticeOpt.isEmpty()) {
+            return new NoticeDeleteResponseDto(
+                    new NoticeDeleteResponseDto.Status("failed", "Notice not found"));
+        }
+        Notice notice = noticeOpt.get();
+
+        // UserNotice 존재 여부 확인
+        Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserAndNotice(user, notice);
+        if (userNoticeOpt.isEmpty()) {
+            return new NoticeDeleteResponseDto(
+                    new NoticeDeleteResponseDto.Status("failed", "UserNotice not found"));
+        }
+        UserNotice userNotice = userNoticeOpt.get();
+
+        // 보관 상태 업데이트
+        userNotice.setIsStored(false);
+        userNoticeRepository.save(userNotice);
+
+        return new NoticeDeleteResponseDto(
+                new NoticeDeleteResponseDto.Status("success", "Notice successfully unstored"));
     }
 
 }
