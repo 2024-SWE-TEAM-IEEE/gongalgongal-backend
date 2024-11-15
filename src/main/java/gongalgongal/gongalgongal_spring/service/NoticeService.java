@@ -1,6 +1,7 @@
 package gongalgongal.gongalgongal_spring.service;
 
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -8,6 +9,7 @@ import gongalgongal.gongalgongal_spring.model.UserNotice;
 
 import gongalgongal.gongalgongal_spring.repository.UserNoticeRepository;
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
+import gongalgongal.gongalgongal_spring.repository.NoticeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,18 +17,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class NoticeService {
 
     private final UserNoticeRepository userNoticeRepository;
     private final UserRepository userRepository;
+    private final NoticeRepository noticeRepository;
 
     @Autowired
     public NoticeService(UserNoticeRepository userNoticeRepository,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                         NoticeRepository noticeRepository) {
         this.userNoticeRepository = userNoticeRepository;
         this.userRepository = userRepository;
+        this.noticeRepository = noticeRepository;
     }
 
     public NoticesResponseDto getNotices(Authentication authentication) {
@@ -62,5 +68,47 @@ public class NoticeService {
         // 4. 응답 생성
         NoticesResponseDto.NoticeListData data = new NoticesResponseDto.NoticeListData(notices);
         return new NoticesResponseDto(new NoticesResponseDto.Status("success", "공지사항 조회 성공"), data);
+    }
+
+    /* 공지 상세 조회 */
+    public NoticesDetailResponseDto getNoticeDetail(Long noticeId, Authentication authentication) {
+        if (noticeId == null || noticeId <= 0) {
+            throw new IllegalArgumentException("Invalid notice ID provided.");
+        }
+
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("Notice not found with ID: " + noticeId));
+
+        String userEmail = authentication.getName();
+
+        Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserEmailAndNoticeId(userEmail, noticeId);
+
+        boolean isStored = userNoticeOpt.map(UserNotice::getIsStored).orElse(false);
+        boolean isStarred = userNoticeOpt.map(UserNotice::getIsStarred).orElse(false);
+
+        NoticesDetailResponseDto.NoticeDetail responseData = new NoticesDetailResponseDto.NoticeDetail(
+                notice.getNoticeId(),
+                notice.getTitle(),
+                notice.getCategories().stream()
+                        .map(category -> new NoticesDetailResponseDto.Category(
+                                category.getCategoryId(),
+                                category.getCategoryName()
+                        ))
+                        .collect(Collectors.toList()),
+                notice.getContent(),
+                notice.getAuthor(),
+                notice.getCreatedAt(),
+                notice.getUrl(),
+                isStored,
+                isStarred,
+                false // [TODO]: 이 부분은 공지 대화방 개발되면 수정 필요
+        );
+
+        NoticesDetailResponseDto.Status status = new NoticesDetailResponseDto.Status(
+                "success",
+                "Notice fetched successfully"
+        );
+
+        return new NoticesDetailResponseDto(status, responseData);
     }
 }

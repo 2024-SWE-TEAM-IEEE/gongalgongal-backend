@@ -1,13 +1,17 @@
 package gongalgongal.gongalgongal_spring.controller;
 
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notices")
@@ -33,4 +37,29 @@ public class NoticeController {
                     .body(new NoticesResponseDto(new NoticesResponseDto.Status("failed", "Internal server error"), null));
         }
     }
+
+    @GetMapping("/{notice_id}")
+    public ResponseEntity<NoticesDetailResponseDto> getNoticeDetail(
+            @PathVariable("notice_id") Long noticeId,
+            Authentication authentication) {
+        try {
+            NoticesDetailResponseDto response = noticeService.getNoticeDetail(noticeId, authentication);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            // 400 Bad Request 처리
+            NoticesDetailResponseDto.Status status = new NoticesDetailResponseDto.Status(
+                    "failed",
+                    e.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticesDetailResponseDto(status, null));
+        } catch (RuntimeException e) {
+            // 404 Not Found 처리
+            NoticesDetailResponseDto.Status status = new NoticesDetailResponseDto.Status(
+                    "failed",
+                    e.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NoticesDetailResponseDto(status, null));
+        }
+    }
+
 }

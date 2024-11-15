@@ -22,6 +22,8 @@ public class Notice {
 
     private String url;
 
+    private String content;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -41,9 +43,10 @@ public class Notice {
     public Notice() {}
 
     // 생성자
-    public Notice(String title, String author, String url) {
+    public Notice(String title, String author, String url, String content) {
         this.title = title;
         this.author = author;
         this.url = url;
+        this.content = content;
     }
 }
