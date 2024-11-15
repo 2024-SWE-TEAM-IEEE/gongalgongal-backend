@@ -1,8 +1,21 @@
 package gongalgongal.gongalgongal_spring.repository;
 
+import gongalgongal.gongalgongal_spring.model.User;
+import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.UserNotice;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.util.List;
+import java.util.Optional;
 
 public interface UserNoticeRepository extends JpaRepository<UserNotice, Long> {
-    // 추가적인 쿼리 메서드 정의 가능
+    List<UserNotice> findByUser(User user);
+
+    @Query("SELECT un FROM UserNotice un " +
+            "JOIN un.user u " +
+            "WHERE u.email = :email AND un.notice.noticeId = :noticeId")
+    Optional<UserNotice> findByUserEmailAndNoticeId(@Param("email") String email, @Param("noticeId") Long noticeId);
+    Optional<UserNotice> findByUserAndNotice(User user, Notice notice);
 }

@@ -43,16 +43,16 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NoticeDetailResponseDto extends ResponseTemplate<NoticeDetailResponseDto.NoticeDetail> {
+public class NoticesDetailResponseDto extends ResponseTemplate<NoticesDetailResponseDto.NoticeDetail> {
 
-    public NoticeDetailResponseDto(Status status, NoticeDetail data) {
+    public NoticesDetailResponseDto(Status status, NoticeDetail data) {
         super(status, data);
     }
 
     @Data
     @AllArgsConstructor
     public static class NoticeDetail {
-        private int id;
+        private long id;
         private String title;
         private List<Category> categories;
         private String content;
@@ -67,7 +67,7 @@ public class NoticeDetailResponseDto extends ResponseTemplate<NoticeDetailRespon
     @Data
     @AllArgsConstructor
     public static class Category {
-        private String id;
+        private long id;
         private String name;
     }
 }

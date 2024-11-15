@@ -34,4 +34,7 @@ public class User {
     // User와 UserGroup 간의 일대다 관계
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserGroup> userGroups = new HashSet<>(); // 사용자가 속한 그룹 목록
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserNotice> userNotice = new HashSet<>();
 }
