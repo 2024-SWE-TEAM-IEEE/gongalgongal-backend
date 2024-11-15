@@ -90,11 +90,11 @@ public class NoticeGroupsResponseDto extends ResponseTemplate<NoticeGroupsRespon
     @Data
     @AllArgsConstructor
     public static class Group {
-        private String id;
+        private Long id;
         private String name;
-        private int adminId;
+        private Long adminId;
         private String siteUrl;
-        private List<Integer> groupCategory;
+        private List<Long> groupCategory;
         private String description;
         private String shareUrl;
         private List<Member> members;
@@ -103,7 +103,7 @@ public class NoticeGroupsResponseDto extends ResponseTemplate<NoticeGroupsRespon
     @Data
     @AllArgsConstructor
     public static class Member {
-        private int id;
+        private Long id;
         private String name;
     }
 }

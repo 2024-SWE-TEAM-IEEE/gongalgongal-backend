@@ -58,12 +58,13 @@ public class NoticeGroupController {
 
     // 참가한 공지 그룹 리스트 조회
     @GetMapping
-    public ResponseEntity<NoticeGroupsResponseDto> getJoinedNoticeGroups() { // [[TODO]] 유저 토큰을 파라미터로 받아야함
+    public ResponseEntity<NoticeGroupsResponseDto> getJoinedNoticeGroups(Authentication authentication) {
         try {
-            long userId = (long) 1;
-            NoticeGroupsResponseDto response = noticeGroupService.getJoinedNoticeGroups(userId);
+            // Authentication 객체를 서비스로 전달
+            NoticeGroupsResponseDto response = noticeGroupService.getJoinedNoticeGroups(authentication);
             return ResponseEntity.ok(response); // 200 OK
         } catch (Exception e) {
+            // 에러 응답
             NoticeGroupsResponseDto response = new NoticeGroupsResponseDto(
                     new NoticeGroupsResponseDto.Status("failed", "Internal server error"),
                     null

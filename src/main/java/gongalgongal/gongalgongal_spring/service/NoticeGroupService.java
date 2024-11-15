@@ -19,6 +19,7 @@ import gongalgongal.gongalgongal_spring.repository.NoticeGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +45,6 @@ public class NoticeGroupService {
     }
 
     /* 공지 그룹 생성 */
-    /* 공지 그룹 생성 */
     public NoticeGroupCreateResponseDto createNoticeGroup(NoticeGroupCreateRequestDto request, Authentication authentication) {
 
         // 1. Authentication 객체에서 adminId 추출
@@ -64,6 +64,7 @@ public class NoticeGroupService {
         NoticeGroup noticeGroup = new NoticeGroup(
                 user.getId(),
                 request.getGroupName(),
+                request.getDescription(),
                 null, // 공유 URL은 나중에 생성
                 request.getCrawlSiteUrl()
         );
@@ -97,47 +98,53 @@ public class NoticeGroupService {
 
 
     /* 참가한 공지 그룹 리스트 조회 */
-    public NoticeGroupsResponseDto getJoinedNoticeGroups(Long userId) {
-        // 실제 데이터베이스 조회 대신 예시 데이터를 생성
-        List<NoticeGroupsResponseDto.Group> groups = searchJoinedNoticeGroups(userId);
+    public NoticeGroupsResponseDto getJoinedNoticeGroups(Authentication authentication) {
+        // 1. Authentication 객체에서 사용자 이메일 추출
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
+        // 2. 참가한 공지 그룹 리스트 조회
+        List<NoticeGroupsResponseDto.Group> groups = searchJoinedNoticeGroups(user.getId());
+
+        // 3. 응답 생성
         NoticeGroupsResponseDto.GroupListData data = new NoticeGroupsResponseDto.GroupListData(groups);
         return new NoticeGroupsResponseDto(new NoticeGroupsResponseDto.Status("success", "조회 성공"), data);
     }
 
-    // [[TODO]]
-    private List<NoticeGroupsResponseDto.Group> searchJoinedNoticeGroups(long userId) {
-        // 실제 userId로 그룹리스트 찾는 로직 구현
-        return List.of(
-                new NoticeGroupsResponseDto.Group(
-                        "group123",
-                        "기술 공지 그룹",
-                        1,
-                        "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
-                        List.of(1, 2),
-                        "기술 관련 공지 사항을 공유하는 그룹입니다.",
-                        "https://example.com/invite/group123",
-                        List.of(
-                                new NoticeGroupsResponseDto.Member(1, "사용자A"),
-                                new NoticeGroupsResponseDto.Member(2, "사용자B"),
-                                new NoticeGroupsResponseDto.Member(3, "사용자C")
-                        )
-                ),
-                new NoticeGroupsResponseDto.Group(
-                        "group456",
-                        "예술 공지 그룹",
-                        2,
-                        "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
-                        List.of(3, 4),
-                        "예술 관련 공지 사항을 공유하는 그룹입니다.",
-                        "https://example.com/invite/group456",
-                        List.of(
-                                new NoticeGroupsResponseDto.Member(1, "사용자A"),
-                                new NoticeGroupsResponseDto.Member(2, "사용자B"),
-                                new NoticeGroupsResponseDto.Member(3, "사용자C")
-                        )
-                )
-        );
+    /* 실제 userId로 그룹리스트 찾는 로직 구현 */
+    @Transactional
+    private List<NoticeGroupsResponseDto.Group> searchJoinedNoticeGroups(Long userId) {
+        // 1. UserGroup 테이블에서 userId로 NoticeGroup 조회
+        List<UserGroup> userGroups = userGroupRepository.findByUser_Id(userId);
+
+        // 2. 조회한 UserGroup 데이터로 NoticeGroupsResponseDto.Group 객체 생성
+        return userGroups.stream()
+                .map(userGroup -> {
+                    NoticeGroup noticeGroup = userGroup.getNoticeGroup();
+
+                    return new NoticeGroupsResponseDto.Group(
+                            noticeGroup.getGroupId(),
+                            noticeGroup.getGroupName(),
+                            noticeGroup.getAdminId(),
+                            noticeGroup.getCrawlSiteUrl(),
+                            noticeGroup.getGroupCategory().stream()
+                                    .map(Category::getCategoryId)
+                                    .collect(Collectors.toList()),
+                            noticeGroup.getDescription(),
+                            noticeGroup.getShareUrl(),
+                            noticeGroup.getUserGroups().stream()
+                                    .map(member -> {
+                                        User user = member.getUser();
+                                        if (user == null) {
+                                            throw new IllegalStateException("User data is missing for member.");
+                                        }
+                                        return new NoticeGroupsResponseDto.Member(user.getId(), user.getName());
+                                    })
+                                    .collect(Collectors.toList())
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 
