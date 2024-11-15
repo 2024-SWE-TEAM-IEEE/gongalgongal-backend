@@ -1,7 +1,9 @@
 package gongalgongal.gongalgongal_spring.repository;
 
 import gongalgongal.gongalgongal_spring.model.User;
+import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.UserNotice;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,5 @@ public interface UserNoticeRepository extends JpaRepository<UserNotice, Long> {
             "JOIN un.user u " +
             "WHERE u.email = :email AND un.notice.noticeId = :noticeId")
     Optional<UserNotice> findByUserEmailAndNoticeId(@Param("email") String email, @Param("noticeId") Long noticeId);
+    Optional<UserNotice> findByUserAndNotice(User user, Notice notice);
 }

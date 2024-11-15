@@ -2,6 +2,7 @@ package gongalgongal.gongalgongal_spring.service;
 
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -111,4 +112,44 @@ public class NoticeService {
 
         return new NoticesDetailResponseDto(status, responseData);
     }
+
+    public NoticeStoreResponseDto storeNotice(Long noticeId, Authentication authentication) {
+        // 사용자 이메일 추출
+        String userEmail = authentication.getName();
+
+        // 사용자 조회
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return new NoticeStoreResponseDto(
+                    new NoticeStoreResponseDto.Status("failed", "User not found"));
+        }
+        User user = userOpt.get();
+
+        // 공지사항 조회
+        Optional<Notice> noticeOpt = noticeRepository.findById(noticeId);
+        if (noticeOpt.isEmpty()) {
+            return new NoticeStoreResponseDto(
+                    new NoticeStoreResponseDto.Status("failed", "Notice not found"));
+        }
+        Notice notice = noticeOpt.get();
+
+        // UserNotice 존재 여부 확인
+        Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserAndNotice(user, notice);
+        UserNotice userNotice;
+
+        if (userNoticeOpt.isPresent()) {
+            userNotice = userNoticeOpt.get();
+        } else {
+            // UserNotice 새로 생성
+            userNotice = new UserNotice(user, notice, false, true);
+        }
+
+        // 보관 상태 업데이트
+        userNotice.setIsStored(true);
+        userNoticeRepository.save(userNotice);
+
+        return new NoticeStoreResponseDto(
+                new NoticeStoreResponseDto.Status("success", "Notice successfully stored"));
+    }
+
 }

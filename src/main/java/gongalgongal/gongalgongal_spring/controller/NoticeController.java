@@ -2,6 +2,7 @@ package gongalgongal.gongalgongal_spring.controller;
 
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeService;
 
@@ -59,6 +60,22 @@ public class NoticeController {
                     e.getMessage()
             );
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NoticesDetailResponseDto(status, null));
+        }
+    }
+
+    @PostMapping("/{notice_id}/store")
+    public ResponseEntity<NoticeStoreResponseDto> storeNotice(
+            @PathVariable("notice_id") Long noticeId,
+            Authentication authentication) {
+        try {
+            NoticeStoreResponseDto response = noticeService.storeNotice(noticeId, authentication);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (IllegalArgumentException e) {
+            NoticeStoreResponseDto.Status status = new NoticeStoreResponseDto.Status("failed", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeStoreResponseDto(status));
+        } catch (Exception e) {
+            NoticeStoreResponseDto.Status status = new NoticeStoreResponseDto.Status("failed", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeStoreResponseDto(status));
         }
     }
 
