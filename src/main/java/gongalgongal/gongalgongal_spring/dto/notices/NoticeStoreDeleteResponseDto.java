@@ -5,9 +5,9 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NoticeDeleteResponseDto extends ResponseTemplate<Object> {
+public class NoticeStoreDeleteResponseDto extends ResponseTemplate<Object> {
 
-    public NoticeDeleteResponseDto(Status status) {
+    public NoticeStoreDeleteResponseDto(Status status) {
         super(status, null);
     }
 }

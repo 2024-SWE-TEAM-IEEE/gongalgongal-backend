@@ -3,7 +3,9 @@ package gongalgongal.gongalgongal_spring.controller;
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
-import gongalgongal.gongalgongal_spring.dto.NoticeDeleteResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStoreDeleteResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStarResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStarDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeService;
 
@@ -81,19 +83,52 @@ public class NoticeController {
     }
 
     @DeleteMapping("/{notice_id}/store")
-    public ResponseEntity<NoticeDeleteResponseDto> unstoreNotice(
+    public ResponseEntity<NoticeStoreDeleteResponseDto> unstoreNotice(
             @PathVariable("notice_id") Long noticeId,
             Authentication authentication) {
         try {
             noticeService.unstoreNotice(noticeId, authentication);
-            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("success", "Notice successfully unstored");
-            return ResponseEntity.status(HttpStatus.OK).body(new NoticeDeleteResponseDto(status));
+            NoticeStoreDeleteResponseDto.Status status = new NoticeStoreDeleteResponseDto.Status("success", "Notice successfully unstored");
+            return ResponseEntity.status(HttpStatus.OK).body(new NoticeStoreDeleteResponseDto(status));
         } catch (IllegalArgumentException e) {
-            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("failed", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeDeleteResponseDto(status));
+            NoticeStoreDeleteResponseDto.Status status = new NoticeStoreDeleteResponseDto.Status("failed", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeStoreDeleteResponseDto(status));
         } catch (Exception e) {
-            NoticeDeleteResponseDto.Status status = new NoticeDeleteResponseDto.Status("failed", "An unexpected error occurred");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeDeleteResponseDto(status));
+            NoticeStoreDeleteResponseDto.Status status = new NoticeStoreDeleteResponseDto.Status("failed", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeStoreDeleteResponseDto(status));
+        }
+    }
+
+    @PostMapping("/{notice_id}/star")
+    public ResponseEntity<NoticeStarResponseDto> starNotice(
+            @PathVariable("notice_id") Long noticeId,
+            Authentication authentication) {
+        try {
+            NoticeStarResponseDto response = noticeService.starNotice(noticeId, authentication);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (IllegalArgumentException e) {
+            NoticeStarResponseDto.Status status = new NoticeStarResponseDto.Status("failed", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeStarResponseDto(status));
+        } catch (Exception e) {
+            NoticeStarResponseDto.Status status = new NoticeStarResponseDto.Status("failed", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeStarResponseDto(status));
+        }
+    }
+
+    @DeleteMapping("/{notice_id}/star")
+    public ResponseEntity<NoticeStarDeleteResponseDto> unstarNotice(
+            @PathVariable("notice_id") Long noticeId,
+            Authentication authentication) {
+        try {
+            noticeService.unstarNotice(noticeId, authentication);
+            NoticeStarDeleteResponseDto.Status status = new NoticeStarDeleteResponseDto.Status("success", "Notice successfully unstarred");
+            return ResponseEntity.status(HttpStatus.OK).body(new NoticeStarDeleteResponseDto(status));
+        } catch (IllegalArgumentException e) {
+            NoticeStarDeleteResponseDto.Status status = new NoticeStarDeleteResponseDto.Status("failed", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new NoticeStarDeleteResponseDto(status));
+        } catch (Exception e) {
+            NoticeStarDeleteResponseDto.Status status = new NoticeStarDeleteResponseDto.Status("failed", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new NoticeStarDeleteResponseDto(status));
         }
     }
 }

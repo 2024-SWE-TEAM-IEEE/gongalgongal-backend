@@ -3,7 +3,9 @@ package gongalgongal.gongalgongal_spring.service;
 import gongalgongal.gongalgongal_spring.dto.NoticesResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticesDetailResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeStoreResponseDto;
-import gongalgongal.gongalgongal_spring.dto.NoticeDeleteResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStoreDeleteResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStarResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeStarDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.Notice;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -153,30 +155,30 @@ public class NoticeService {
                 new NoticeStoreResponseDto.Status("success", "Notice successfully stored"));
     }
 
-    public NoticeDeleteResponseDto unstoreNotice(Long noticeId, Authentication authentication) {
+    public NoticeStoreDeleteResponseDto unstoreNotice(Long noticeId, Authentication authentication) {
         String userEmail = authentication.getName();
 
         // 사용자 조회
         Optional<User> userOpt = userRepository.findByEmail(userEmail);
         if (userOpt.isEmpty()) {
-            return new NoticeDeleteResponseDto(
-                    new NoticeDeleteResponseDto.Status("failed", "User not found"));
+            return new NoticeStoreDeleteResponseDto(
+                    new NoticeStoreDeleteResponseDto.Status("failed", "User not found"));
         }
         User user = userOpt.get();
 
         // 공지사항 조회
         Optional<Notice> noticeOpt = noticeRepository.findById(noticeId);
         if (noticeOpt.isEmpty()) {
-            return new NoticeDeleteResponseDto(
-                    new NoticeDeleteResponseDto.Status("failed", "Notice not found"));
+            return new NoticeStoreDeleteResponseDto(
+                    new NoticeStoreDeleteResponseDto.Status("failed", "Notice not found"));
         }
         Notice notice = noticeOpt.get();
 
         // UserNotice 존재 여부 확인
         Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserAndNotice(user, notice);
         if (userNoticeOpt.isEmpty()) {
-            return new NoticeDeleteResponseDto(
-                    new NoticeDeleteResponseDto.Status("failed", "UserNotice not found"));
+            return new NoticeStoreDeleteResponseDto(
+                    new NoticeStoreDeleteResponseDto.Status("failed", "UserNotice not found"));
         }
         UserNotice userNotice = userNoticeOpt.get();
 
@@ -184,8 +186,83 @@ public class NoticeService {
         userNotice.setIsStored(false);
         userNoticeRepository.save(userNotice);
 
-        return new NoticeDeleteResponseDto(
-                new NoticeDeleteResponseDto.Status("success", "Notice successfully unstored"));
+        return new NoticeStoreDeleteResponseDto(
+                new NoticeStoreDeleteResponseDto.Status("success", "Notice successfully unstored"));
     }
+
+    public NoticeStarResponseDto starNotice(Long noticeId, Authentication authentication) {
+        // 사용자 이메일 추출
+        String userEmail = authentication.getName();
+
+        // 사용자 조회
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return new NoticeStarResponseDto(
+                    new NoticeStarResponseDto.Status("failed", "User not found"));
+        }
+        User user = userOpt.get();
+
+        // 공지사항 조회
+        Optional<Notice> noticeOpt = noticeRepository.findById(noticeId);
+        if (noticeOpt.isEmpty()) {
+            return new NoticeStarResponseDto(
+                    new NoticeStarResponseDto.Status("failed", "Notice not found"));
+        }
+        Notice notice = noticeOpt.get();
+
+        // UserNotice 존재 여부 확인
+        Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserAndNotice(user, notice);
+        UserNotice userNotice;
+
+        if (userNoticeOpt.isPresent()) {
+            userNotice = userNoticeOpt.get();
+        } else {
+            // UserNotice 새로 생성
+            userNotice = new UserNotice(user, notice, true, false);
+        }
+
+        // 보관 상태 업데이트
+        userNotice.setIsStarred(true);
+        userNoticeRepository.save(userNotice);
+
+        return new NoticeStarResponseDto(
+                new NoticeStarResponseDto.Status("success", "Notice successfully starred"));
+    }
+
+    public NoticeStarDeleteResponseDto unstarNotice(Long noticeId, Authentication authentication) {
+        String userEmail = authentication.getName();
+
+        // 사용자 조회
+        Optional<User> userOpt = userRepository.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return new NoticeStarDeleteResponseDto(
+                    new NoticeStarDeleteResponseDto.Status("failed", "User not found"));
+        }
+        User user = userOpt.get();
+
+        // 공지사항 조회
+        Optional<Notice> noticeOpt = noticeRepository.findById(noticeId);
+        if (noticeOpt.isEmpty()) {
+            return new NoticeStarDeleteResponseDto(
+                    new NoticeStarDeleteResponseDto.Status("failed", "Notice not found"));
+        }
+        Notice notice = noticeOpt.get();
+
+        // UserNotice 존재 여부 확인
+        Optional<UserNotice> userNoticeOpt = userNoticeRepository.findByUserAndNotice(user, notice);
+        if (userNoticeOpt.isEmpty()) {
+            return new NoticeStarDeleteResponseDto(
+                    new NoticeStarDeleteResponseDto.Status("failed", "UserNotice not found"));
+        }
+        UserNotice userNotice = userNoticeOpt.get();
+
+        // 보관 상태 업데이트
+        userNotice.setIsStarred(false);
+        userNoticeRepository.save(userNotice);
+
+        return new NoticeStarDeleteResponseDto(
+                new NoticeStarDeleteResponseDto.Status("success", "Notice successfully unstored"));
+    }
+
 
 }
