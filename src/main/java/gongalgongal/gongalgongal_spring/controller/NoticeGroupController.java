@@ -5,6 +5,7 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupJoinResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupLeaveResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeGroupDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeGroupService;
 
@@ -74,6 +75,32 @@ public class NoticeGroupController {
         }
     }
 
+    // 공지 그룹 삭제
+    @DeleteMapping("/{group_id}")
+    public ResponseEntity<NoticeGroupDeleteResponseDto> deleteNoticeGroup(
+            @PathVariable("group_id") Long groupId,
+            Authentication authentication) {
+        try {
+            NoticeGroupDeleteResponseDto response = noticeGroupService.deleteNoticeGroup(groupId, authentication);
+            return ResponseEntity.ok(response); // 200 OK
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN) // 403 Forbidden
+                    .body(new NoticeGroupDeleteResponseDto(
+                            new NoticeGroupJoinResponseDto.Status("failed", e.getMessage())
+                    ));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND) // 404 Not Found
+                    .body(new NoticeGroupDeleteResponseDto(
+                            new NoticeGroupJoinResponseDto.Status("failed", e.getMessage())
+                    ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
+                    .body(new NoticeGroupDeleteResponseDto(
+                            new NoticeGroupJoinResponseDto.Status("failed", e.getMessage())
+                    ));
+        }
+    }
+
     @PostMapping("/{group_id}/join")
     public ResponseEntity<NoticeGroupJoinResponseDto> joinNoticeGroup(
             @PathVariable("group_id") Long groupId,
@@ -120,5 +147,7 @@ public class NoticeGroupController {
                     ));
         }
     }
+
+
 
 }

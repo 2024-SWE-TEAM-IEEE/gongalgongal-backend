@@ -5,6 +5,7 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupJoinResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupLeaveResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeGroupDeleteResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.NoticeGroup;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -148,6 +149,34 @@ public class NoticeGroupService {
                 .collect(Collectors.toList());
     }
 
+    /* 공지 그룹 제거 */
+    @Transactional
+    public NoticeGroupDeleteResponseDto deleteNoticeGroup(Long groupId, Authentication authentication) {
+        // 1. Authentication 객체에서 사용자 정보 추출
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+
+        // 2. NoticeGroup 조회
+        NoticeGroup noticeGroup = noticeGroupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Group not found with ID: " + groupId));
+
+        // 3. 관리자인지 확인
+        if (!noticeGroup.getAdminId().equals(user.getId())) {
+            throw new IllegalArgumentException("Only the admin can delete this group.");
+        }
+
+        // 4. UserGroup 삭제
+        userGroupRepository.deleteByNoticeGroup(noticeGroup);
+
+        // 5. NoticeGroup 삭제
+        noticeGroupRepository.delete(noticeGroup);
+
+        // 6. 성공 응답 반환
+        return new NoticeGroupDeleteResponseDto(
+                new NoticeGroupJoinResponseDto.Status("success", "공지 그룹 삭제 완료")
+        );
+    }
 
 
     /* 공지 그룹 참가 */
@@ -216,6 +245,10 @@ public class NoticeGroupService {
                 UserGroup newAdmin = otherMembers.get(new Random().nextInt(otherMembers.size()));
                 newAdmin.setRole(UserRole.Admin);
                 userGroupRepository.save(newAdmin);
+
+                // NoticeGroup의 adminId 업데이트
+                noticeGroup.setAdminId(newAdmin.getUser().getId());
+                noticeGroupRepository.save(noticeGroup);
             }
         }
 
