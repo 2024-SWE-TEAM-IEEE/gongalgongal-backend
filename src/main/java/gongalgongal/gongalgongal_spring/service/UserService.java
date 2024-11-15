@@ -2,9 +2,7 @@ package gongalgongal.gongalgongal_spring.service;
 
 import gongalgongal.gongalgongal_spring.dto.UpdateUserRequest;
 import gongalgongal.gongalgongal_spring.dto.UserInfoResponse;
-import gongalgongal.gongalgongal_spring.model.Category;
 import gongalgongal.gongalgongal_spring.model.User;
-import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,12 +14,10 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CategoryRepository categoryRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -31,13 +27,7 @@ public class UserService {
                         new UserInfoResponse.Status("success", "User information retrieved successfully"),
                         new UserInfoResponse.Data(
                                 user.getEmail(),
-                                user.getName(),
-                                user.getSelectedCategories().stream()
-                                        .map(category -> new UserInfoResponse.CategoryInfo(
-                                                category.getCategoryId(),
-                                                category.getCategoryName()
-                                        ))
-                                        .collect(Collectors.toList())
+                                user.getName()
                         )
                 ));
     }
@@ -51,12 +41,6 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
             }
 
-            // 선택된 카테고리 ID로 카테고리 목록 조회
-            Set<Category> categories = request.getSelectedCategoryIds().stream()
-                    .map(categoryRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toSet());
 
             user.setSelectedCategories(categories);
             return userRepository.save(user);

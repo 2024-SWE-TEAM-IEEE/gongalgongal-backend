@@ -59,7 +59,6 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
     public static class Notice {
         private long id;
         private String title;
-        private List<Category> categories;
         private String content;
         private String author;
         private LocalDateTime noticedDate;

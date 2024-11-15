@@ -1,8 +1,6 @@
 package gongalgongal.gongalgongal_spring.service;
 
-import gongalgongal.gongalgongal_spring.model.Category;
 import gongalgongal.gongalgongal_spring.model.User;
-import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import gongalgongal.gongalgongal_spring.dto.AuthResponse;
 import gongalgongal.gongalgongal_spring.dto.UserLoginRequest;

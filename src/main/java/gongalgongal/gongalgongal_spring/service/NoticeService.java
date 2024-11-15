@@ -55,12 +55,6 @@ public class NoticeService {
                     return new NoticesResponseDto.Notice(
                             notice.getNoticeId(),
                             notice.getTitle(),
-                            notice.getCategories().stream()
-                                    .map(category -> new NoticesResponseDto.Category(
-                                            category.getCategoryId(),
-                                            category.getCategoryName()
-                                    ))
-                                    .collect(Collectors.toList()),
                             notice.getContent(),
                             notice.getAuthor(),
                             notice.getCreatedAt(),
@@ -95,13 +89,6 @@ public class NoticeService {
 
         NoticesDetailResponseDto.NoticeDetail responseData = new NoticesDetailResponseDto.NoticeDetail(
                 notice.getNoticeId(),
-                notice.getTitle(),
-                notice.getCategories().stream()
-                        .map(category -> new NoticesDetailResponseDto.Category(
-                                category.getCategoryId(),
-                                category.getCategoryName()
-                        ))
-                        .collect(Collectors.toList()),
                 notice.getContent(),
                 notice.getAuthor(),
                 notice.getCreatedAt(),

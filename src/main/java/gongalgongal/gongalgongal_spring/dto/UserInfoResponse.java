@@ -34,12 +34,10 @@ public class UserInfoResponse {
     public static class Data {
         private String email;
         private String name;
-        private List<CategoryInfo> categories;
 
         public Data(String email, String name, List<CategoryInfo> categories) {
             this.email = email;
             this.name = name;
-            this.categories = categories;
         }
     }
 

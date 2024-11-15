@@ -23,6 +23,5 @@ import java.util.List;
 public class NoticeGroupCreateRequestDto {
     private String groupName;
     private String description;
-    private List<Integer> groupCategory;
     private String crawlSiteUrl;
 }

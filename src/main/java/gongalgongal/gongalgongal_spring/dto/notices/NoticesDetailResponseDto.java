@@ -54,7 +54,6 @@ public class NoticesDetailResponseDto extends ResponseTemplate<NoticesDetailResp
     public static class NoticeDetail {
         private long id;
         private String title;
-        private List<Category> categories;
         private String content;
         private String author;
         private LocalDateTime noticedDate;

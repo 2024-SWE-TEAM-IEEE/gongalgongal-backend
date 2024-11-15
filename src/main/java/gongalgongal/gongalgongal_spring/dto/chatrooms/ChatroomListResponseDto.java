@@ -31,7 +31,6 @@ public class ChatroomListResponseDto extends ResponseTemplate<ChatroomListRespon
     public static class Chatroom {
         private Long id;               // chatroom id
         private Long noticeId;         // notice id
-        private List<Category> categories; // 카테고리 리스트
         private String title;          // 채팅방 제목
         private List<Member> members;  // 멤버 리스트
     }
