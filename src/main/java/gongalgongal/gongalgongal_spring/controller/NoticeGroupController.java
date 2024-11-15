@@ -4,6 +4,7 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateRequestDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupJoinResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeGroupLeaveResponseDto;
 
 import gongalgongal.gongalgongal_spring.service.NoticeGroupService;
 
@@ -95,6 +96,29 @@ public class NoticeGroupController {
         }
     }
 
-
+    @PostMapping("/{group_id}/leave")
+    public ResponseEntity<NoticeGroupLeaveResponseDto> leaveNoticeGroup(
+            @PathVariable("group_id") Long groupId,
+            Authentication authentication) {
+        try {
+            NoticeGroupLeaveResponseDto response = noticeGroupService.leaveNoticeGroup(groupId, authentication);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new NoticeGroupLeaveResponseDto(
+                            new NoticeGroupLeaveResponseDto.Status("failed", e.getMessage())
+                    ));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new NoticeGroupLeaveResponseDto(
+                            new NoticeGroupLeaveResponseDto.Status("failed", e.getMessage())
+                    ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new NoticeGroupLeaveResponseDto(
+                            new NoticeGroupLeaveResponseDto.Status("failed", "Internal server error occurred")
+                    ));
+        }
+    }
 
 }

@@ -4,6 +4,7 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateRequestDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupCreateResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupJoinResponseDto;
 import gongalgongal.gongalgongal_spring.dto.NoticeGroupsResponseDto;
+import gongalgongal.gongalgongal_spring.dto.NoticeGroupLeaveResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.NoticeGroup;
 import gongalgongal.gongalgongal_spring.model.User;
@@ -186,4 +187,48 @@ public class NoticeGroupService {
         userGroupRepository.save(userGroup);
     }
 
+
+    /* 공지 그룹 탈퇴 */
+    @Transactional
+    public NoticeGroupLeaveResponseDto leaveNoticeGroup(Long groupId, Authentication authentication) {
+        // 1. Authentication 객체에서 사용자 이메일 추출
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+
+        // 2. 그룹 존재 여부 확인
+        NoticeGroup noticeGroup = noticeGroupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Group not found with ID: " + groupId));
+
+        // 3. UserGroup 조회
+        UserGroup userGroup = userGroupRepository.findByUserAndNoticeGroup(user, noticeGroup)
+                .orElseThrow(() -> new NoSuchElementException("User is not a member of the specified group"));
+
+        // 4. 관리자 권한 체크
+        if (userGroup.getRole() == UserRole.Admin) {
+            // 그룹 내 다른 멤버 조회
+            List<UserGroup> otherMembers = userGroupRepository.findByNoticeGroupAndUserNot(noticeGroup, user);
+            if (otherMembers.isEmpty()) {
+                // 그룹 내 다른 멤버가 없는 경우 그룹 삭제
+                noticeGroupRepository.delete(noticeGroup);
+            } else {
+                // 그룹 내 다른 멤버가 있는 경우 새 관리자를 랜덤으로 지정
+                UserGroup newAdmin = otherMembers.get(new Random().nextInt(otherMembers.size()));
+                newAdmin.setRole(UserRole.Admin);
+                userGroupRepository.save(newAdmin);
+            }
+        }
+
+//        // 5. 관련 데이터에 "탈퇴한 사용자"로 표시
+//        // 예: 공지사항이나 댓글을 작성한 데이터에서 작성자 정보를 "탈퇴한 사용자"로 업데이트
+//        noticeGroupRepository.updateCreatorToLeftUser(user.getId(), groupId);
+
+        // 6. UserGroup 엔트리 삭제
+        userGroupRepository.delete(userGroup);
+
+        // 7. 응답 생성
+        return new NoticeGroupLeaveResponseDto(
+                new NoticeGroupLeaveResponseDto.Status("success", "You have successfully left the group.")
+        );
+    }
 }
