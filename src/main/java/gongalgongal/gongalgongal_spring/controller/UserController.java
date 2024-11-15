@@ -46,9 +46,6 @@ public class UserController {
                         "data", Map.of(
                                 "email", user.getEmail(),
                                 "name", user.getName(),
-                                "categories", user.getSelectedCategories().stream()
-                                        .map(category -> Map.of("id", category.getCategoryId(), "name", category.getCategoryName()))
-                                        .collect(Collectors.toList())
                         )
                 )))
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of(
