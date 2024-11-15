@@ -57,7 +57,7 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
     @Data
     @AllArgsConstructor
     public static class Notice {
-        private int id;
+        private long id;
         private String title;
         private List<Category> categories;
         private String author;
@@ -69,7 +69,7 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
     @Data
     @AllArgsConstructor
     public static class Category {
-        private String id;
+        private long id;
         private String name;
     }
 }

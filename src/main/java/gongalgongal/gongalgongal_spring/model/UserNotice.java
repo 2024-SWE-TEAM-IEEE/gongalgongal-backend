@@ -1,10 +1,9 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.*;
 
 @Entity
 @Data
@@ -14,8 +13,13 @@ public class UserNotice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userNoticeId;
 
-    private Long userId;
-    private Long noticeId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "notice_id", referencedColumnName = "noticeId", nullable = false)
+    private Notice notice;
 
     private Boolean isStarred;
 
@@ -25,9 +29,9 @@ public class UserNotice {
     public UserNotice() {}
 
     // 생성자
-    public UserNotice(Long userId, Long noticeId, Boolean isStarred, Boolean isStored) {
-        this.userId = userId;
-        this.noticeId = noticeId;
+    public UserNotice(User user, Notice notice, Boolean isStarred, Boolean isStored) {
+        this.user = user;
+        this.notice = notice;
         this.isStarred = isStarred;
         this.isStored = isStored;
     }
