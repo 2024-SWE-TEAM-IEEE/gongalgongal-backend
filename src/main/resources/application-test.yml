@@ -8,6 +8,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   h2:
     console:
       enabled: true
@@ -15,3 +19,12 @@ spring:
     property-naming-strategy: SNAKE_CASE
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE

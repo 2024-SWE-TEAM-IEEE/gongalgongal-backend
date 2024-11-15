@@ -3,7 +3,7 @@ package gongalgongal.gongalgongal_spring.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -30,4 +30,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> selectedCategories;
+
+    // User와 UserGroup 간의 일대다 관계
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserGroup> userGroups = new HashSet<>(); // 사용자가 속한 그룹 목록
 }
