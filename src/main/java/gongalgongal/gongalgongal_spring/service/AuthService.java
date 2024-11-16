@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -27,6 +28,9 @@ public class AuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private EmailService emailService;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -76,7 +80,7 @@ public class AuthService {
         // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             // 비밀번호 불일치 -> 실패 응답 생성
-            AuthResponse.Status status = new AuthResponse.Status("failed", "Invalid credentials");
+            AuthResponse.Status status = new AuthResponse.Status("failed", "Incorrect password");
             return new AuthResponse(status, null);
         }
 
@@ -102,6 +106,27 @@ public class AuthService {
         AuthResponse.EmailCheckData data = new AuthResponse.EmailCheckData(isDuplicated);
 
         return new AuthResponse(status, data);
+    }
+
+    //비밀번호 찾기 메소드
+    public void forgotPassword(String email) {
+        // 1. 사용자 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("The provided email address does not exist in our records"));
+
+        // 2. 임시 비밀번호 생성
+        String temporaryPassword = UUID.randomUUID().toString().substring(0, 8); // 8자리 랜덤 문자열
+
+        // 3. 임시 비밀번호 암호화 및 저장
+        user.setPassword(passwordEncoder.encode(temporaryPassword));
+        userRepository.save(user);
+
+        // 4. 이메일 전송
+        emailService.sendEmail(
+                email,
+                "공알공알 임시 비밀번호",
+                user.getName() + "님의 임시 비밀번호는 " + temporaryPassword + "입니다. 로그인 후 비밀번호를 변경해주세요."
+        );
     }
 }
 
