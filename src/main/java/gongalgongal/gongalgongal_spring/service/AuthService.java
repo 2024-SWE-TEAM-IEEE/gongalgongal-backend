@@ -58,7 +58,7 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail());
 
         AuthResponse.Status status = new AuthResponse.Status("success", "User registered successfully");
-        AuthResponse.Data data = new AuthResponse.Data(token);
+        AuthResponse.AccessTokenData data = new AuthResponse.AccessTokenData(token);
         return new AuthResponse(status, data);
     }
 
@@ -85,7 +85,22 @@ public class AuthService {
 
         // 성공 응답 생성 및 반환
         AuthResponse.Status status = new AuthResponse.Status("success", "Login successful");
-        AuthResponse.Data data = new AuthResponse.Data(token);
+        AuthResponse.AccessTokenData data = new AuthResponse.AccessTokenData(token);
+        return new AuthResponse(status, data);
+    }
+
+    // 이메일 검증 메서드
+    public AuthResponse checkEmail(String email) {
+        boolean isDuplicated = userRepository.existsByEmail(email);
+        String message = isDuplicated ? "Email already exists" : "Email is available";
+
+        AuthResponse.Status status = new AuthResponse.Status(
+                isDuplicated ? "failed" : "success",
+                message
+        );
+
+        AuthResponse.EmailCheckData data = new AuthResponse.EmailCheckData(isDuplicated);
+
         return new AuthResponse(status, data);
     }
 }

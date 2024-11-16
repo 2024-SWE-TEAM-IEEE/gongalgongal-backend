@@ -28,5 +28,11 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/validate-id")
+    public ResponseEntity<AuthResponse> checkEmail(@RequestParam String email) {
+        AuthResponse response = authService.checkEmail(email);
+        return ResponseEntity.ok(response);
+    }
 }
 
