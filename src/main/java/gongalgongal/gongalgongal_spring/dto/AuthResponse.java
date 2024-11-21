@@ -27,13 +27,28 @@ public class AuthResponse {
         }
     }
 
+    // 데이터 세분화
+    public interface Data {}
+
+    //로그인, 회원가입 전용 Response
     @Getter
     @Setter
-    public static class Data {
-        private String AccessToken;
+    public static class AccessTokenData implements Data {
+        private String accessToken;
 
-        public Data(String AccessToken) {
-            this.AccessToken = AccessToken;
+        public AccessTokenData(String accessToken) {
+            this.accessToken = accessToken;
+        }
+    }
+
+    // 아이디 중복 여부 확인 전용 Response
+    @Getter
+    @Setter
+    public static class EmailCheckData implements Data {
+        private Boolean isDuplicated;
+
+        public EmailCheckData(Boolean isDuplicated) {
+            this.isDuplicated = isDuplicated;
         }
     }
 }

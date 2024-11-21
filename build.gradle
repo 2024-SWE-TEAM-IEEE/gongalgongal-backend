@@ -46,7 +46,9 @@ dependencies {
 
 	// Spring Security Crypto
 	implementation 'org.springframework.security:spring-security-crypto'
-}
+
+	//mail sender
+	implementation 'org.springframework.boot:spring-boot-starter-mail'}
 
 tasks.named('test') {
 	useJUnitPlatform()
