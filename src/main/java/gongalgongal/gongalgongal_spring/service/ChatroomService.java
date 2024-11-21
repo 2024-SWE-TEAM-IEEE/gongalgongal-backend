@@ -1,14 +1,17 @@
 package gongalgongal.gongalgongal_spring.service;
 
 import gongalgongal.gongalgongal_spring.dto.ChatroomJoinResponseDto;
+import gongalgongal.gongalgongal_spring.dto.ChatroomListResponseDto;
 
 import gongalgongal.gongalgongal_spring.model.Chatroom;
 import gongalgongal.gongalgongal_spring.model.User;
 import gongalgongal.gongalgongal_spring.model.ChatMessage;
+import gongalgongal.gongalgongal_spring.model.Notice;
 
 import gongalgongal.gongalgongal_spring.repository.ChatroomRepository;
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import gongalgongal.gongalgongal_spring.repository.ChatMessageRepository;
+import gongalgongal.gongalgongal_spring.repository.NoticeRepository;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +27,64 @@ public class ChatroomService {
     private final ChatroomRepository chatroomRepository;
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final NoticeRepository noticeRepository;
 
     @Autowired
-    public ChatroomService(ChatroomRepository chatroomRepository, UserRepository userRepository, ChatMessageRepository chatMessageRepository) {
+    public ChatroomService(ChatroomRepository chatroomRepository, UserRepository userRepository, ChatMessageRepository chatMessageRepository, NoticeRepository noticeRepository) {
         this.chatroomRepository = chatroomRepository;
         this.userRepository = userRepository;
         this.chatMessageRepository = chatMessageRepository;
+        this.noticeRepository = noticeRepository;
     }
+
+    public ChatroomListResponseDto getAllChatrooms(Authentication authentication) {
+        // 사용자 이메일 조회
+        String userEmail = authentication.getName();
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 사용자의 모든 채팅방 조회
+        List<Chatroom> chatrooms = new ArrayList<>(user.getChatrooms());
+
+        // 채팅방 목록 데이터 생성
+        List<ChatroomListResponseDto.Chatroom> chatroomList = chatrooms.stream().map(chatroom -> {
+            // Notice 정보 조회
+            Notice notice = noticeRepository.findById(chatroom.getNoticeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Notice not found for chatroom ID: " + chatroom.getChatId()));
+
+            // 카테고리 데이터 변환
+            List<ChatroomListResponseDto.Category> categories = notice.getCategories().stream()
+                    .map(category -> new ChatroomListResponseDto.Category(category.getCategoryId(), category.getCategoryName()))
+                    .collect(Collectors.toList());
+
+            // 멤버 데이터 변환
+            List<ChatroomListResponseDto.Member> members = chatroom.getUsers().stream()
+                    .map(userMember -> new ChatroomListResponseDto.Member(
+                            userMember.getId(),
+                            userMember.getName(),
+                            userMember.getEmail() // 이메일 추가
+                    ))
+                    .collect(Collectors.toList());
+
+            // 채팅방 데이터 반환
+            return new ChatroomListResponseDto.Chatroom(
+                    chatroom.getChatId(),
+                    chatroom.getNoticeId(),
+                    categories,
+                    notice.getTitle(), // Notice의 제목 가져오기
+                    members
+            );
+        }).collect(Collectors.toList());
+
+        // 응답 데이터 생성
+        ChatroomListResponseDto.ChatroomListData chatroomListData = new ChatroomListResponseDto.ChatroomListData(chatroomList);
+
+        return new ChatroomListResponseDto(
+                new ChatroomListResponseDto.Status("success", "Chatrooms retrieved successfully"),
+                chatroomListData
+        );
+    }
+
 
     public ChatroomJoinResponseDto joinChatroom(Long noticeId, Authentication authentication) {
         // 사용자 이메일 조회
