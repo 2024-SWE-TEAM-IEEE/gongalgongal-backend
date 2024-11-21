@@ -22,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException; // 데이터 무결성 예외
 
+import java.lang.IllegalArgumentException; // 잘못된 인자 예외
+import java.lang.RuntimeException; // 런타임 예외
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +128,20 @@ public class NoticeGroupService {
                 .map(userGroup -> {
                     NoticeGroup noticeGroup = userGroup.getNoticeGroup();
 
+                    // 현재 사용자를 제외한 다른 멤버 조회
+                    List<UserGroup> otherMembers = userGroupRepository.findByNoticeGroupAndUserNot(noticeGroup, userGroup.getUser());
+
+                    // 멤버 리스트 생성
+                    List<NoticeGroupsResponseDto.Member> members = otherMembers.stream()
+                            .map(memberGroup -> {
+                                User member = memberGroup.getUser();
+                                if (member == null) {
+                                    throw new IllegalStateException("User data is missing for member.");
+                                }
+                                return new NoticeGroupsResponseDto.Member(member.getId(), member.getName());
+                            })
+                            .collect(Collectors.toList());
+
                     return new NoticeGroupsResponseDto.Group(
                             noticeGroup.getGroupId(),
                             noticeGroup.getGroupName(),
@@ -135,15 +152,7 @@ public class NoticeGroupService {
                                     .collect(Collectors.toList()),
                             noticeGroup.getDescription(),
                             noticeGroup.getShareUrl(),
-                            noticeGroup.getUserGroups().stream()
-                                    .map(member -> {
-                                        User user = member.getUser();
-                                        if (user == null) {
-                                            throw new IllegalStateException("User data is missing for member.");
-                                        }
-                                        return new NoticeGroupsResponseDto.Member(user.getId(), user.getName());
-                                    })
-                                    .collect(Collectors.toList())
+                            members // 조회한 멤버 리스트 사용
                     );
                 })
                 .collect(Collectors.toList());
@@ -209,6 +218,30 @@ public class NoticeGroupService {
         return userGroupRepository.existsByUserAndNoticeGroup(user, noticeGroup);
     }
 
+//    /* 그룹 참가 로직 구현 */
+//    private void joinUserToGroup(User user, NoticeGroup noticeGroup) {
+//        try {
+//            // UserGroup 생성
+//            UserGroup userGroup = new UserGroup(user, noticeGroup, UserRole.Member);
+//            // 동기화
+//            user.getUserGroups().add(userGroup);
+//            noticeGroup.getUserGroups().add(userGroup);
+//
+//            // 상위 엔티티 저장
+//            userRepository.save(user);
+//            noticeGroupRepository.save(noticeGroup);
+//
+//        } catch (IllegalArgumentException e) {
+//            // 잘못된 인자 처리
+//            throw new RuntimeException("Invalid argument: " + e.getMessage(), e);
+//        } catch (DataIntegrityViolationException e) {
+//            // 데이터베이스 무결성 관련 예외 처리
+//            throw new RuntimeException("Data integrity violation: " + e.getMessage(), e);
+//        } catch (Exception e) {
+//            // 기타 모든 예외 처리
+//            throw new RuntimeException("Unexpected error occurred while joining user to group: " + e.getMessage(), e);
+//        }
+//    }
     /* 그룹 참가 로직 구현 */
     private void joinUserToGroup(User user, NoticeGroup noticeGroup) {
         // UserGroup 생성 및 저장
