@@ -1,26 +1,32 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class Chatroom {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatId;
 
     private Long noticeId;
 
+    @ManyToMany(mappedBy = "chatrooms")
+    private Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMessage> chatMessages = new ArrayList<>(); // 채팅 메시지 저장
+
     // 기본 생성자
     public Chatroom() {}
 
-    // 생성자
+    // noticeId만 받는 생성자
     public Chatroom(Long noticeId) {
         this.noticeId = noticeId;
     }
+
 }
