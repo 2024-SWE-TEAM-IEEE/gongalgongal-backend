@@ -1,38 +1,36 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long messageId;
+    private Long id;
 
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "chatroom_id", nullable = false)
+    private Chatroom chatroom;
 
-    private Long chatId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private String content;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // 기본 생성자
-    public ChatMessage() {}
-
-    // 생성자
-    public ChatMessage(Long userId, Long chatId, String content) {
-        this.userId = userId;
-        this.chatId = chatId;
+    public ChatMessage(Chatroom chatroom, User user, String content, LocalDateTime createdAt) {
+        this.chatroom = chatroom;
+        this.user = user;
         this.content = content;
+        this.createdAt = createdAt;
     }
 }
-

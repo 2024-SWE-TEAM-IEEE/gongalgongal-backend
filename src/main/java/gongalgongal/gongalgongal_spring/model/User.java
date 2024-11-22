@@ -2,7 +2,6 @@ package gongalgongal.gongalgongal_spring.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.*;
 
 @Entity
@@ -37,4 +36,15 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserNotice> userNotice = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_chatroom",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "chatroom_id")
+    )
+    private Set<Chatroom> chatrooms = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMessage> chatMessages = new ArrayList<>(); // User's authored messages
 }
