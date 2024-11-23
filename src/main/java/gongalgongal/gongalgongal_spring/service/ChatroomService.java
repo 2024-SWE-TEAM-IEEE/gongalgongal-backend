@@ -109,7 +109,7 @@ public class ChatroomService {
             chatroom.setUsers(new HashSet<>());
         }
 
-        // 사용자가 채팅방에 이미 참여 중인지 확인
+        // 사용자가 채팅방에 참여 중이지 않다면 추가
         if (!chatroom.getUsers().contains(user)) {
             chatroom.getUsers().add(user);
             user.getChatrooms().add(chatroom); // User의 chatrooms에도 추가
@@ -120,9 +120,7 @@ public class ChatroomService {
                 throw new RuntimeException("Failed to add user to chatroom", e);
             }
         }
-        else {
-            throw new RuntimeException("User is already a member of the chatroom");
-        }
+
 
         // 채팅 메시지 조회
         List<ChatroomJoinResponseDto.Chat> chats;
