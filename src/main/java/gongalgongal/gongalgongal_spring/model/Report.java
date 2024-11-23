@@ -1,44 +1,29 @@
 package gongalgongal.gongalgongal_spring.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.Data;
-import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Report {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reportId;
+    private Long id;
 
-    private Long messageId;
+    @ManyToOne
+    @JoinColumn(name = "chat_id", nullable = false)
+    private ChatMessage chatMessage; // 신고된 메시지
 
-    private Long reportingUserId;
+    @ManyToOne
+    @JoinColumn(name = "reporting_user_id", nullable = false)
+    private User reportingUser; // 신고한 사용자
 
-    private String reason;
+    private String reason; // 신고 사유
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Enumerated(EnumType.STRING)
-    private ReportStatus status;
-
-    // 기본 생성자
-    public Report() {}
-
-    // 생성자
-    public Report(Long messageId, Long reportingUserId, String reason, ReportStatus status) {
-        this.messageId = messageId;
-        this.reportingUserId = reportingUserId;
-        this.reason = reason;
-        this.status = status;
-    }
+    private LocalDateTime createdAt; // 신고 일시
 }
