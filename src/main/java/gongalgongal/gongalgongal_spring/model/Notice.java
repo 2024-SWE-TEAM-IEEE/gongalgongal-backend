@@ -29,7 +29,7 @@ public class Notice {
 
     // Notice와 UserNotice 간의 일대다 관계
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<UserNotice> userNotices = new HashSet<>(); // 그룹에 속한 사용자 목록
+    private ArrayList<UserNotice> userNotices = new ArrayList<>(); // 그룹에 속한 사용자 목록
 
     // 기본 생성자
     public Notice() {}

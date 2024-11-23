@@ -1,12 +1,12 @@
 package gongalgongal.gongalgongal_spring.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class UserInfoResponse {
 
     private Status status;
