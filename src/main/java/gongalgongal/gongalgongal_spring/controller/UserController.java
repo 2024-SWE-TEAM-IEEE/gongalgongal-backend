@@ -28,7 +28,7 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(404)
                         .body(new UserInfoResponse(
-                                new UserInfoResponse.Status("failed", "User not found"),
+                                new UserInfoResponse.Status("failed", "User not found. not exist"),
                                 null
                         )));
     }

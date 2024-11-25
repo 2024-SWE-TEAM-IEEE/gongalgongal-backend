@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.emptyList()  // 권한이 있을 경우 추가 가능
+                Collections.emptyList()
         );
     }
 }

@@ -35,7 +35,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "chatroom_id")
     )
-    private Set<Chatroom> chatrooms = new HashSet<>();
+    private List<Chatroom> chatrooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> chatMessages = new ArrayList<>(); // User's authored messages

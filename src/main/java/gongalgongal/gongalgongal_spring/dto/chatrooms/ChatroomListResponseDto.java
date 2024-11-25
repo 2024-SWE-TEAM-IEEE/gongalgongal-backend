@@ -1,9 +1,6 @@
 package gongalgongal.gongalgongal_spring.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -36,7 +33,8 @@ public class ChatroomListResponseDto extends ResponseTemplate<ChatroomListRespon
     }
 
     // Member 내부 클래스 정의
-    @Data
+    @Getter
+    @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Member {
