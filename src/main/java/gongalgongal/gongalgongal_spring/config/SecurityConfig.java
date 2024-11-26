@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",       // OpenAPI 3 문서 경로
                                 "/swagger-ui/**",        // Swagger UI 리소스 경로
-                                "/swagger-ui.html",       // Swagger UI HTML 페이지
+                                "/swagger-ui.html"     // Swagger UI HTML 페이지
                         ).permitAll()  // 인증 없이 접근 허용
                         .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
                 )

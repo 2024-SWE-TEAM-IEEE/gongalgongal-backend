@@ -10,9 +10,7 @@ import gongalgongal.gongalgongal_spring.dto.NoticeGroupDeleteResponseDto;
 import gongalgongal.gongalgongal_spring.model.NoticeGroup;
 import gongalgongal.gongalgongal_spring.model.User;
 import gongalgongal.gongalgongal_spring.model.UserGroup;
-import gongalgongal.gongalgongal_spring.model.UserRole;
-import gongalgongal.gongalgongal_spring.model.Notice;
-import gongalgongal.gongalgongal_spring.model.UserNotice;
+import gongalgongal.gongalgongal_spring.model.enums.UserRole;
 
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import gongalgongal.gongalgongal_spring.repository.UserGroupRepository;

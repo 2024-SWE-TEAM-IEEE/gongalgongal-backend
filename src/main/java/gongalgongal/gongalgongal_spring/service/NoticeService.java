@@ -94,8 +94,7 @@ public class NoticeService {
                 notice.getCreatedAt(),
                 notice.getUrl(),
                 isStored,
-                isStarred,
-                false // [TODO]: 이 부분은 공지 대화방 개발되면 수정 필요
+                isStarred
         );
 
         NoticesDetailResponseDto.Status status = new NoticesDetailResponseDto.Status(
