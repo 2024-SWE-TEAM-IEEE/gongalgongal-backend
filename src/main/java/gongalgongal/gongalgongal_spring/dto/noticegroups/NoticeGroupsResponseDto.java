@@ -64,7 +64,6 @@ Response:
       }
     }
 */
-
 package gongalgongal.gongalgongal_spring.dto;
 
 import lombok.AllArgsConstructor;
@@ -98,6 +97,7 @@ public class NoticeGroupsResponseDto extends ResponseTemplate<NoticeGroupsRespon
         private String description;
         private String shareUrl;
         private List<Member> members;
+        private boolean isParticipant; // 사용자 참가 여부 플래그
     }
 
     @Data

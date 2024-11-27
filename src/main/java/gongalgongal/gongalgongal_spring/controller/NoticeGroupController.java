@@ -60,10 +60,10 @@ public class NoticeGroupController {
 
     // 참가한 공지 그룹 리스트 조회
     @GetMapping
-    public ResponseEntity<NoticeGroupsResponseDto> getJoinedNoticeGroups(Authentication authentication) {
+    public ResponseEntity<NoticeGroupsResponseDto> getNoticeGroups(Authentication authentication) {
         try {
             // Authentication 객체를 서비스로 전달
-            NoticeGroupsResponseDto response = noticeGroupService.getJoinedNoticeGroups(authentication);
+            NoticeGroupsResponseDto response = noticeGroupService.getAllNoticeGroupsWithParticipantStatus(authentication);
             return ResponseEntity.ok(response); // 200 OK
         } catch (Exception e) {
             // 에러 응답
