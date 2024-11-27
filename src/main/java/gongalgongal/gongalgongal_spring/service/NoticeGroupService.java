@@ -142,14 +142,17 @@ public class NoticeGroupService {
                             })
                             .collect(Collectors.toList());
 
+                    // 그룹 카테고리 리스트 생성
+                    List<NoticeGroupsResponseDto.CategoryInfo> groupCategory = noticeGroup.getGroupCategory().stream()
+                            .map(category -> new NoticeGroupsResponseDto.CategoryInfo(category.getCategoryId(), category.getCategoryName()))
+                            .collect(Collectors.toList());
+
                     return new NoticeGroupsResponseDto.Group(
                             noticeGroup.getGroupId(),
                             noticeGroup.getGroupName(),
                             noticeGroup.getAdminId(),
                             noticeGroup.getCrawlSiteUrl(),
-                            noticeGroup.getGroupCategory().stream()
-                                    .map(Category::getCategoryId)
-                                    .collect(Collectors.toList()),
+                            groupCategory, // 수정된 groupCategory 매핑
                             noticeGroup.getDescription(),
                             noticeGroup.getShareUrl(),
                             members // 조회한 멤버 리스트 사용
