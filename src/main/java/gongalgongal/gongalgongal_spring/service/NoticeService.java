@@ -61,10 +61,13 @@ public class NoticeService {
                                             category.getCategoryName()
                                     ))
                                     .collect(Collectors.toList()),
+                            notice.getContent(),
                             notice.getAuthor(),
                             notice.getCreatedAt(),
+                            notice.getUrl(),
                             userNotice.getIsStored(),
-                            userNotice.getIsStarred()
+                            userNotice.getIsStarred(),
+                            false // [TODO]: 이 부분은 공지 대화방 개발되면 수정 필요
                     );
                 })
                 .collect(Collectors.toList());
