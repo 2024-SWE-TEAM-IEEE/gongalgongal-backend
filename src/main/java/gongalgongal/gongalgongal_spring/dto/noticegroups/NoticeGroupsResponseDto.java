@@ -64,7 +64,6 @@ Response:
       }
     }
 */
-
 package gongalgongal.gongalgongal_spring.dto;
 
 import lombok.AllArgsConstructor;
@@ -94,15 +93,23 @@ public class NoticeGroupsResponseDto extends ResponseTemplate<NoticeGroupsRespon
         private String name;
         private Long adminId;
         private String siteUrl;
-        private List<Long> groupCategory;
+        private List<CategoryInfo> groupCategory;
         private String description;
         private String shareUrl;
         private List<Member> members;
+        private boolean isParticipant; // 사용자 참가 여부 플래그
     }
 
     @Data
     @AllArgsConstructor
     public static class Member {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class CategoryInfo {
         private Long id;
         private String name;
     }

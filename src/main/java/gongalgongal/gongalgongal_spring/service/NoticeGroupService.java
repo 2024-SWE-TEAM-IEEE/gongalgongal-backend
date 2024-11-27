@@ -98,41 +98,48 @@ public class NoticeGroupService {
 
     /* 공유 URL 생성 */
     private String generateShareUrl(Long groupId, String groupName) {
-        return "https://your-service.com/groups/" + groupName.replace(" ", "-") + "-" + groupId;
+        return "/tab/group/details/" + groupId;
     }
 
 
-    /* 참가한 공지 그룹 리스트 조회 */
-    public NoticeGroupsResponseDto getJoinedNoticeGroups(Authentication authentication) {
+    /* 전체 공지 그룹 리스트 조회 */
+    public NoticeGroupsResponseDto getAllNoticeGroupsWithParticipantStatus(Authentication authentication) {
         // 1. Authentication 객체에서 사용자 이메일 추출
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
 
-        // 2. 참가한 공지 그룹 리스트 조회
-        List<NoticeGroupsResponseDto.Group> groups = searchJoinedNoticeGroups(user.getId());
+        // 2. 전체 공지 그룹 리스트 조회
+        List<NoticeGroupsResponseDto.Group> groups = searchAllNoticeGroups(user.getId());
 
         // 3. 응답 생성
         NoticeGroupsResponseDto.GroupListData data = new NoticeGroupsResponseDto.GroupListData(groups);
         return new NoticeGroupsResponseDto(new NoticeGroupsResponseDto.Status("success", "조회 성공"), data);
     }
 
-    /* 실제 userId로 그룹리스트 찾는 로직 구현 */
+    /* 실제 userId로 전체 그룹 리스트와 참가 여부 플래그를 찾는 로직 구현 */
     @Transactional
-    private List<NoticeGroupsResponseDto.Group> searchJoinedNoticeGroups(Long userId) {
-        // 1. UserGroup 테이블에서 userId로 NoticeGroup 조회
-        List<UserGroup> userGroups = userGroupRepository.findByUser_Id(userId);
+    private List<NoticeGroupsResponseDto.Group> searchAllNoticeGroups(Long userId) {
+        // 1. 사용자 ID로 User 객체 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        // 2. 조회한 UserGroup 데이터로 NoticeGroupsResponseDto.Group 객체 생성
-        return userGroups.stream()
-                .map(userGroup -> {
-                    NoticeGroup noticeGroup = userGroup.getNoticeGroup();
+        // 2. 전체 NoticeGroup 조회
+        List<NoticeGroup> allNoticeGroups = noticeGroupRepository.findAll();
 
-                    // 현재 사용자를 제외한 다른 멤버 조회
-                    List<UserGroup> otherMembers = userGroupRepository.findByNoticeGroupAndUserNot(noticeGroup, userGroup.getUser());
+        // 3. 사용자가 참가한 그룹 ID 조회
+        List<Long> participantGroupIds = userGroupRepository.findByUser_Id(userId).stream()
+                .map(userGroup -> userGroup.getNoticeGroup().getGroupId())
+                .collect(Collectors.toList());
+
+        // 4. NoticeGroup 데이터를 NoticeGroupsResponseDto.Group 객체로 변환
+        return allNoticeGroups.stream()
+                .map(noticeGroup -> {
+                    // 그룹의 모든 멤버 조회 (현재 사용자 포함)
+                    List<UserGroup> allMembers = userGroupRepository.findByNoticeGroup(noticeGroup);
 
                     // 멤버 리스트 생성
-                    List<NoticeGroupsResponseDto.Member> members = otherMembers.stream()
+                    List<NoticeGroupsResponseDto.Member> members = allMembers.stream()
                             .map(memberGroup -> {
                                 User member = memberGroup.getUser();
                                 if (member == null) {
@@ -142,21 +149,30 @@ public class NoticeGroupService {
                             })
                             .collect(Collectors.toList());
 
+                    // 그룹 카테고리 리스트 생성
+                    List<NoticeGroupsResponseDto.CategoryInfo> groupCategory = noticeGroup.getGroupCategory().stream()
+                            .map(category -> new NoticeGroupsResponseDto.CategoryInfo(category.getCategoryId(), category.getCategoryName()))
+                            .collect(Collectors.toList());
+
+                    // 참가 여부 플래그 설정
+                    boolean isParticipant = participantGroupIds.contains(noticeGroup.getGroupId());
+
                     return new NoticeGroupsResponseDto.Group(
                             noticeGroup.getGroupId(),
                             noticeGroup.getGroupName(),
                             noticeGroup.getAdminId(),
                             noticeGroup.getCrawlSiteUrl(),
-                            noticeGroup.getGroupCategory().stream()
-                                    .map(Category::getCategoryId)
-                                    .collect(Collectors.toList()),
+                            groupCategory,
                             noticeGroup.getDescription(),
                             noticeGroup.getShareUrl(),
-                            members // 조회한 멤버 리스트 사용
+                            members,
+                            isParticipant // 참가 여부 플래그 추가
                     );
                 })
                 .collect(Collectors.toList());
     }
+
+
 
     /* 공지 그룹 제거 */
     @Transactional

@@ -14,6 +14,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
     boolean existsByUserAndNoticeGroup(User user, NoticeGroup noticeGroup);
 
     Optional<UserGroup> findByUserAndNoticeGroup(User user, NoticeGroup noticeGroup);
+    List<UserGroup> findByNoticeGroup(NoticeGroup noticeGroup);
 
     List<UserGroup> findByNoticeGroupAndUserNot(NoticeGroup noticeGroup, User user);
 
