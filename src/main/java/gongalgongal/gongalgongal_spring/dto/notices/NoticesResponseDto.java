@@ -60,10 +60,13 @@ public class NoticesResponseDto extends ResponseTemplate<NoticesResponseDto.Noti
         private long id;
         private String title;
         private List<Category> categories;
+        private String content;
         private String author;
         private LocalDateTime noticedDate;
+        private String url;
         private boolean isStored;
         private boolean isStarred;
+        private boolean isParticipating;
     }
 
     @Data
