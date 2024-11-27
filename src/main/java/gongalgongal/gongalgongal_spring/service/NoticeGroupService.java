@@ -98,7 +98,7 @@ public class NoticeGroupService {
 
     /* 공유 URL 생성 */
     private String generateShareUrl(Long groupId, String groupName) {
-        return "https://your-service.com/groups/" + groupName.replace(" ", "-") + "-" + groupId;
+        return "/tab/group/details/" + groupId;
     }
 
 
