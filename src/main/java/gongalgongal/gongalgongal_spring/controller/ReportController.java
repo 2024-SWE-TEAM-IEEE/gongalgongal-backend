@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chatrooms/{chatroom_id}/chats/{chat_id}/report")
+@RequestMapping("/api/chatrooms/{notice_id}/chats/{chat_id}/report")
 public class ReportController {
     private final ReportService reportService;
     private final UserRepository userRepository; // UserRepository를 생성자 주입으로 선언
