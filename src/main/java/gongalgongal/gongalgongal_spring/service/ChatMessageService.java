@@ -29,8 +29,8 @@ public class ChatMessageService {
     private EntityManager entityManager;
 
     @Transactional
-    public ChatMessageResponseDto createChatMessage(Long chatroomId, String email, ChatMessageRequestDto requestDto) {
-        Chatroom chatroom = chatroomRepository.findById(chatroomId)
+    public ChatMessageResponseDto createChatMessage(Long noticeId, String email, ChatMessageRequestDto requestDto) {
+        Chatroom chatroom = chatroomRepository.findByNoticeId(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("Chatroom not found"));
 
         // 이메일로 사용자 조회

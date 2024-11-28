@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chatrooms/{chatroom_id}/chat")
+@RequestMapping("/api/chatrooms/{notice_id}/chat")
 public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
     @PostMapping
     public ResponseEntity<?> createChatMessage(
-            @PathVariable("chatroom_id") Long chatroomId,
+            @PathVariable("notice_id") Long noticeId,
             @RequestBody ChatMessageRequestDto requestDto
     ) {
         // JWT에서 이메일 추출
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         // 서비스 호출
-        ChatMessageResponseDto responseDto = chatMessageService.createChatMessage(chatroomId, email, requestDto);
+        ChatMessageResponseDto responseDto = chatMessageService.createChatMessage(noticeId, email, requestDto);
 
         // 응답 반환
         return ResponseEntity.ok().body(new ResponseWrapper(
