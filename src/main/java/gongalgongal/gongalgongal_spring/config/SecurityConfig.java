@@ -42,7 +42,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 미사용
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // CORS 설정 추가
+                .cors(cors -> cors
+                        .configurationSource(corsConfigurationSource())
+                        .and()
+                        .headers(headers -> headers.frameOptions().disable())
+                );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
