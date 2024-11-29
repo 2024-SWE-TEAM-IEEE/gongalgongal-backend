@@ -12,11 +12,15 @@ import gongalgongal.gongalgongal_spring.model.User;
 import gongalgongal.gongalgongal_spring.model.UserGroup;
 import gongalgongal.gongalgongal_spring.model.Category;
 import gongalgongal.gongalgongal_spring.model.UserRole;
+import gongalgongal.gongalgongal_spring.model.Notice;
+import gongalgongal.gongalgongal_spring.model.UserNotice;
 
 import gongalgongal.gongalgongal_spring.repository.UserRepository;
 import gongalgongal.gongalgongal_spring.repository.UserGroupRepository;
 import gongalgongal.gongalgongal_spring.repository.CategoryRepository;
 import gongalgongal.gongalgongal_spring.repository.NoticeGroupRepository;
+import gongalgongal.gongalgongal_spring.repository.NoticeRepository;
+import gongalgongal.gongalgongal_spring.repository.UserNoticeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,17 +40,23 @@ public class NoticeGroupService {
     private final UserGroupRepository userGroupRepository;
     private final CategoryRepository categoryRepository;
     private final NoticeGroupRepository noticeGroupRepository;
+    private final NoticeRepository noticeRepository;
+    private final UserNoticeRepository userNoticeRepository;
 
     @Autowired
     public NoticeGroupService(
             UserRepository userRepository,
             UserGroupRepository userGroupRepository,
             CategoryRepository categoryRepository,
-            NoticeGroupRepository noticeGroupRepository) {
+            NoticeGroupRepository noticeGroupRepository,
+            NoticeRepository noticeRepository,
+            UserNoticeRepository userNoticeRepository) {
         this.userRepository = userRepository;
         this.userGroupRepository = userGroupRepository;
         this.categoryRepository = categoryRepository;
         this.noticeGroupRepository = noticeGroupRepository;
+        this.noticeRepository = noticeRepository;
+        this.userNoticeRepository = userNoticeRepository;
     }
 
     /* 공지 그룹 생성 */
@@ -223,7 +233,10 @@ public class NoticeGroupService {
         // 4. 참가 로직 처리
         joinUserToGroup(user, noticeGroup);
 
-        // 5. 성공 응답 생성
+        // 5. 공지 저장 로직 처리
+        saveRelevantNoticesForUser(user, noticeGroup);
+
+        // 6. 성공 응답 생성
         return new NoticeGroupJoinResponseDto(
                 new NoticeGroupJoinResponseDto.Status("success", "Joined group successfully")
         );
@@ -234,7 +247,38 @@ public class NoticeGroupService {
         return userGroupRepository.existsByUserAndNoticeGroup(user, noticeGroup);
     }
 
-//    /* 그룹 참가 로직 구현 */
+    /* 사용자와 공지그룹에 부합하는 공지 저장 */
+    private void saveRelevantNoticesForUser(User user, NoticeGroup noticeGroup) {
+        // 그룹 카테고리와 사용자 카테고리 가져오기
+        Set<Category> groupCategories = noticeGroup.getGroupCategory();
+        Set<Category> userCategories = user.getSelectedCategories();
+
+        // 1단계: 공지 카테고리와 공지 그룹 카테고리의 합집합으로 필터링
+        List<Notice> noticesMatchingGroup = noticeRepository.findAll().stream()
+                .filter(notice -> notice.getCategories().stream().anyMatch(groupCategories::contains))
+                .collect(Collectors.toList());
+
+        // 2단계: 위에서 모은 공지들 중 사용자 카테고리와 합집합으로 필터링
+        List<Notice> relevantNotices = noticesMatchingGroup.stream()
+                .filter(notice -> notice.getCategories().stream().anyMatch(userCategories::contains))
+                .collect(Collectors.toList());
+
+        // UserNotice 객체 생성
+        List<UserNotice> userNotices = relevantNotices.stream()
+                .map(notice -> new UserNotice(user, notice, false, false)) // 기본값으로 isStarred와 isStored는 false
+                .collect(Collectors.toList());
+
+        // 중복 방지: 이미 저장된 공지는 제외
+        userNotices.forEach(userNotice -> {
+            if (!userNoticeRepository.findByUserAndNotice(user, userNotice.getNotice()).isPresent()) {
+                userNoticeRepository.save(userNotice);
+            }
+        });
+    }
+
+
+
+    //    /* 그룹 참가 로직 구현 */
 //    private void joinUserToGroup(User user, NoticeGroup noticeGroup) {
 //        try {
 //            // UserGroup 생성

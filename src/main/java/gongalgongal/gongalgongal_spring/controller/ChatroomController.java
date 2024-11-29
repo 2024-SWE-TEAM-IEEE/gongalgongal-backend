@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.CacheControl;
 
 @RestController
 @RequestMapping("/api/chatrooms")
@@ -24,7 +25,10 @@ public class ChatroomController {
             // 서비스 호출
             ChatroomListResponseDto response = chatroomService.getAllChatrooms(authentication);
 
-            return ResponseEntity.ok(response);
+            // Cache-Control 헤더 추가
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.noCache()) // 캐싱 방지 설정
+                    .body(response);
 
         } catch (IllegalArgumentException e) {
             // 사용자 입력 관련 예외 처리

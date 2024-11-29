@@ -18,6 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManagerFactory;
+
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +34,10 @@ public class ChatroomService {
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final NoticeRepository noticeRepository;
+
+//    private final EntityManagerFactory entityManagerFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public ChatroomService(ChatroomRepository chatroomRepository, UserRepository userRepository, ChatMessageRepository chatMessageRepository, NoticeRepository noticeRepository) {
@@ -85,7 +95,7 @@ public class ChatroomService {
         );
     }
 
-
+    @Transactional
     public ChatroomJoinResponseDto joinChatroom(Long noticeId, Authentication authentication) {
         // 사용자 이메일 조회
         String userEmail = authentication.getName();
@@ -97,7 +107,7 @@ public class ChatroomService {
                 .orElseGet(() -> {
                     Chatroom newChatroom = new Chatroom(noticeId);
                     try {
-                        chatroomRepository.save(newChatroom);
+                        chatroomRepository.saveAndFlush(newChatroom);
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to create a new chatroom", e);
                     }
@@ -114,18 +124,24 @@ public class ChatroomService {
             chatroom.getUsers().add(user);
             user.getChatrooms().add(chatroom); // User의 chatrooms에도 추가
             try {
-                chatroomRepository.save(chatroom);
-                userRepository.save(user); // User도 저장
+                chatroomRepository.saveAndFlush(chatroom);
+                userRepository.saveAndFlush(user); // User도 저장
             } catch (Exception e) {
                 throw new RuntimeException("Failed to add user to chatroom", e);
             }
         }
 
+        // 영속성 컨텍스트 초기화
+        entityManager.clear();
 
-        // 채팅 메시지 조회
+        // 최신 데이터 재조회
+        chatroom = chatroomRepository.findById(chatroom.getChatId())
+                .orElseThrow(() -> new IllegalArgumentException("Chatroom not found"));
+
+        // 채팅 메시지 조회 (JPQL 쿼리 사용)
         List<ChatroomJoinResponseDto.Chat> chats;
         try {
-            chats = chatMessageRepository.findByChatroom(chatroom).stream()
+            chats = chatMessageRepository.findByChatroomId(chatroom.getChatId()).stream()
                     .map(msg -> new ChatroomJoinResponseDto.Chat(
                             msg.getId(),
                             new ChatroomJoinResponseDto.Author(msg.getUser().getId(), msg.getUser().getName()),

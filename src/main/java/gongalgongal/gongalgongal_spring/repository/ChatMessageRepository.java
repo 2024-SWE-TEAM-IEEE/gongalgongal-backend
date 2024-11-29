@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    @Query("SELECT cm FROM ChatMessage cm WHERE cm.chatroom = :chatroom")
-    List<ChatMessage> findByChatroom(@Param("chatroom") Chatroom chatroom);
+    @Query("SELECT m FROM ChatMessage m WHERE m.chatroom.id = :chatroomId ORDER BY m.createdAt ASC")
+    List<ChatMessage> findByChatroomId(@Param("chatroomId") Long chatroomId);
 }
